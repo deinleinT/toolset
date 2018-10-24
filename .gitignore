@@ -1,4 +1,5 @@
 src/*.xlsx
+src/Standards
 *.project
 *.pydevproject
 notes.txt

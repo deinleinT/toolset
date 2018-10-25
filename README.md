@@ -26,20 +26,20 @@ Infos regarding to python and the pip you'll find here: https://www.python.org/ 
 * The previous point has shown, that this could be very costly, especially if you want to download many standarddocuments.
 * The common approach using this script is to download the excelfile by clicking on the exceliconbutton in the upper right corner.
 * Save the excelfile in the folder besides this script.
-* Make a copy of the excelfile. You should reuse the excelfile for any further runs of this script. Name one copy of the excelfile *REFERENCE-ECXELFILE*.
+* Make a copy of the excelfile. You should reuse the excelfile for any further runs of this script. Name one copy of the excelfile *REFERENCE-EXCELFILE*.
 * Then run this script as follows:
 
 ```
-python standardsHandler.py LATEST-EXCELFILE REFERENCE-ECXELFILE
+python standardsHandler.py LATEST-EXCELFILE REFERENCE-EXCELFILE
 ```
 
-* The script checks whether there is a standard in the *LATEST-EXCELFILE* which is not in the *REFERENCE-ECXELFILE*. If this is the case, the complete row will saved into the *REFERENCE-ECXELFILE*. The script also generates new columns for the version-number and the corresponding date. These columns refer to the online data.
-* Then, the standards in the *REFERENCE-ECXELFILE* are distributed over several threads. Every thread connect the individual download-site of each standard and looks up which version and date is available.
-* After all threads are finished every standard version-number and date are compared with the looked up online verion-number and date. If there is a different version and date online than in the *REFERENCE-ECXELFILE*, the newest version will be downloaded.
+* The script checks whether there is a standard in the *LATEST-EXCELFILE* which is not in the *REFERENCE-EXCELFILE*. If this is the case, the complete row will saved into the *REFERENCE-EXCELFILE*. The script also generates new columns for the version-number and the corresponding date. These columns refer to the online data.
+* Then, the standards in the *REFERENCE-EXCELFILE* are distributed over several threads. Every thread connect the individual download-site of each standard and looks up which version and date is available.
+* After all threads are finished every standard version-number and date are compared with the looked up online verion-number and date. If there is a different version and date online than in the *REFERENCE-EXCELFILE*, the newest version will be downloaded.
 * All changed standards will be downloaded. The zip-files are opened and if there is only one doc- or docx-file, this file will be converted to pdf and the doc- and zipfile will be deleted. Otherwise the zip-file has to be handled manually.
-* If the download of the zip-file was successful, the corresponding row of the standard in the *REFERENCE-ECXELFILE* will be updated.
+* If the download of the zip-file was successful, the corresponding row of the standard in the *REFERENCE-EXCELFILE* will be updated.
 * In the last step there are a *check-txt*-file and a *log-file* generated with additonally information.
-* Use the *REFERENCE-ECXELFILE* for following updates. The only thing you have to do is to download the *LATEST-EXCELFILE* as described in the first step.
+* Use the *REFERENCE-EXCELFILE* for following updates. The only thing you have to do is to download the *LATEST-EXCELFILE* as described in the first step.
 
 **Attention!**
 The converting into pdf could take a while, especially when you use the script the first time and many zip-file are downloaded. 
@@ -58,7 +58,7 @@ python pdfExtracter.py
 
 ## Usage of *standardsToBib.py*
 * This script extracts the standards within the *REFERENCE-ECXELFILE* into a bib-file.
-* With the optional parameter *-i* there just will be the standards extracted which are marked as important within the *REFERENCE-ECXELFILE*.
+* With the optional parameter *-i* there just will be the standards extracted which are marked as important within the *REFERENCE-EXCELFILE*.
 * Because a specific standards can have several release versions, the version-number and the corresponding date is saved into the *note*-field.
 
 ```

@@ -26,7 +26,7 @@ Infos regarding to python and the pip you'll find here: https://www.python.org/ 
 * The previous point has shown, that this could be very costly, especially if you want to download many standarddocuments.
 * The common approach using this script is to download the excelfile by clicking on the exceliconbutton in the upper right corner.
 * Save the excelfile in the folder besides this script.
-* Make a copy of the excelfile. You should reuse the excelfile for any further runs of this script. Name one copy of the excelfile *REFERENCE-EXCELFILE*.
+* Make a copy of the downloaded excelfile. Name one copy of the excelfile *REFERENCE-EXCELFILE*. You should reuse the *REFERENCE-EXCELFILE* for any further runs of this script. The *REFERENCE-EXCELFILE* is maintained automatically by the script. If you want to know whether there are new versions of standards available you just have do download the *LATEST-EXCELFILE* as mentioned above. 
 * Then run this script as follows:
 
 ```

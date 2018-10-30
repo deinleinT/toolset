@@ -61,6 +61,10 @@ Regarding to 36.300 the latest version (and date) of release 15 and release 14 w
 python pdfExtracter.py
 ```
 
+**Important remark:**
+Despite the usage of several threads for extracting the scope of each pdf the finishing of this script might take a while. It depends on the number of pdfs in the *Specifications*-Folder.
+
+
 ## Usage of *specificationsToBib.py*
 * This script extracts the specifications within the *REFERENCE-ECXELFILE* into a bib-file.
 * With the optional parameter *-i* there just will be the specifications extracted which are marked as important within the *REFERENCE-EXCELFILE*.

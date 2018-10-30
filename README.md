@@ -18,7 +18,7 @@ pip install bibtexparser
 
 Infos regarding to python and the pip you'll find here: https://www.python.org/ or https://pypi.org/
 
-## Usage of *standardsHelper.py*
+## Usage of *specificationsHelper.py*
 
 * First of all, visit the 3GPP Portal via https://portal.3gpp.org/ and choose the tab *Specifications*.
 * Fill out the corresponding fields for searching the specifications you are interested in. For example, we search for all specifications of the series 38.
@@ -30,7 +30,7 @@ Infos regarding to python and the pip you'll find here: https://www.python.org/ 
 * Then run this script as follows:
 
 ```
-python standardsHandler.py LATEST-EXCELFILE REFERENCE-EXCELFILE
+python specificationsHandler.py LATEST-EXCELFILE REFERENCE-EXCELFILE
 ```
 
 * The script checks whether there is a specification in the *LATEST-EXCELFILE* which is not in the *REFERENCE-EXCELFILE*. If this is the case, the complete row will saved into the *REFERENCE-EXCELFILE*. The script also generates new columns for the version-number and the corresponding date. These columns refer to the online data.
@@ -50,24 +50,24 @@ Choose the tab *Versions*. The versions are sorted by the release. In this case 
 Regarding to 36.300 the latest version (and date) of release 15 and release 14 would be checked and compared to the values which are saved in the REFERENCE-EXCELFILE. If there are newer versions available, it would be downloaded and the referring field in the column would be updated.
 
 ## Usage of *pdfExtracter.py*
-* Be sure, there is a folder with name *Standards* in the same directory as this script. 
-* All PDF-Files in the *Standards*-Folder will be searched through and the individual scope-section will be read.
+* Be sure, there is a folder with name *Specifications* in the same directory as this script. 
+* All PDF-Files in the *Specifications*-Folder will be searched through and the individual scope-section will be read.
 * This script uses several threads to shorten the procedure.
-* After all threads are finished a textfile with name *scopeOfStandards.txt* is generated.
-* In this txt-document are all scope-sections of all captured standarddocuments saved.
+* After all threads are finished a textfile with name *scopeOfSpecifications.txt* is generated.
+* In this txt-document are all scope-sections of all captured specificationdocuments saved.
 * Now it is possible to do a keywordsearch within this txt-file. 
 
 ```
 python pdfExtracter.py
 ```
 
-## Usage of *standardsToBib.py*
+## Usage of *specificationsToBib.py*
 * This script extracts the specifications within the *REFERENCE-ECXELFILE* into a bib-file.
 * With the optional parameter *-i* there just will be the specifications extracted which are marked as important within the *REFERENCE-EXCELFILE*.
 * Because a specific specifications can have several release versions, the version-number and the corresponding date is saved into the *note*-field.
 
 ```
-python standardsToBib.py REFERENCE-EXCELFILE OUTPUT-BIBFILE [-i]
+python specificationsToBib.py REFERENCE-EXCELFILE OUTPUT-BIBFILE [-i]
 ```
 
 ## Authors

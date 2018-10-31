@@ -45,7 +45,7 @@ python specificationsHandler.py LATEST-EXCELFILE REFERENCE-EXCELFILE
 The converting into pdf might take a while, especially when you use the script the first time and many zip-files are downloaded. 
 
 **Important remark:**
-Within the REFERENCE-EXCELFILE there will be columns generated with name *Version* and *Date* and *VersionTwo* and *DateTwo*. The data referring to these columns is retrieved online from the individual specification site. For example, consider the specification of specification 36.300 --> https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=2430.
+Within the REFERENCE-EXCELFILE there will be columns generated with name *Version* and *Date* and *VersionTwo* and *DateTwo*. The data referring to these columns is retrieved online from the individual specification site. For example, consider the specification with id 36.300 --> https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=2430.
 Choose the tab *Versions*. The versions are sorted by the release. In this case the columns *Version* and *Date* correspond to the release at the top and the latest published version, *VersionTwo* and *DateTwo* always correspond to the release which comes next to the first release. 
 Regarding to 36.300 the latest version (and date) of release 15 and release 14 would be checked and compared to the values which are saved in the REFERENCE-EXCELFILE. If there are newer versions available, it would be downloaded and the referring field in the column would be updated.
 

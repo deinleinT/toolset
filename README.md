@@ -4,7 +4,7 @@ Handling many 3GPP specifications could be complex and a timelasting procedure. 
 
 ### Prerequisites and Installing
 
-The scripts are written in python. Version 3.6 or more up to date is needed. We implemented the scripts under Microsoft Windows 10 and if you want using the toolset in a comprised way, you also need Microsoft Word and Excel.
+The scripts are written in python. Version 3.6 or more up to date is needed. The scripts were implemented under Microsoft Windows 10 and if you want using the toolset in a comprised way, you also need Microsoft Word and Excel.
 Several python packages are needed as well. You can use the python package index (pip) for installing the needed packages as follows:
 
 ```

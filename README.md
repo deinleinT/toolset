@@ -62,13 +62,13 @@ python pdfExtracter.py
 ```
 
 **Important remark:**
-Despite the usage of several threads for extracting the scope of each pdf the finishing of this script might take a while. It depends on the number of pdfs in the *Specifications*-Folder.
+Despite the usage of several threads for extracting the scope of each pdf the finishing of this script could take a while. It depends on the number of pdfs in the *Specifications*-Folder.
 
 
 ## Usage of *specificationsToBib.py*
 * This script extracts the specifications within the *REFERENCE-ECXELFILE* into a bib-file.
-* With the optional parameter *-i* there just will be the specifications extracted which are marked as important within the *REFERENCE-EXCELFILE*.
-* Because a specific specifications can have several release versions, the version-number and the corresponding date is saved into the *note*-field.
+* With the optional parameter *-i* only the specifications will be extracted which are marked as important within the *REFERENCE-EXCELFILE*.
+* Because a specific specification can have several release versions, the version-number and the corresponding date is saved into the *note*-field.
 
 ```
 python specificationsToBib.py REFERENCE-EXCELFILE OUTPUT-BIBFILE [-i]

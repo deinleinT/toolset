@@ -207,8 +207,10 @@ def extractAndConvert():
         failed.add("-1")
         return 
     
+    pdfcounter = 1
     for name in pdfs:
         standard = name.split('_')[0]
+        print("***Progress of converting all pdfs***: " + str(int(pdfcounter / len(pdfs) * 100)) + "%")
         print("Specification-ID is " + str(standard) + " and name of ZIP-File is " + name)
         if standard in noUpdate or standard in failed:
             print("Skip Extracting of " + str(name) + " because is in noUpdate or failed (e.g., Excel-File has already been updated).\n")
@@ -224,7 +226,7 @@ def extractAndConvert():
             currentUpdate(standard, "one")
         elif str(specs[standard].downloadTwo) == "1" and str(specs[standard].releaseOnlineTwo) in name:
             currentUpdate(standard, "two")
-                    
+        pdfcounter += 1           
     return 
 
     

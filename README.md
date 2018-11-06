@@ -26,28 +26,28 @@ Infos regarding to python and the pip you'll find here: https://www.python.org/ 
 * The previous point has shown, that this could be very costly, especially if you want to download many specifications.
 * The common approach using this script is to download the excelfile by clicking on the excel-icon-button in the upper right corner.
 * Save the excelfile in the folder besides this script.
-* Make a copy of the downloaded excelfile. Name one copy of the excelfile *REFERENCE-EXCELFILE*. You should reuse the *REFERENCE-EXCELFILE* for any further runs of this script. The *REFERENCE-EXCELFILE* is maintained automatically by the script. If you want to know whether there are new versions of specifications available you just have do download the *LATEST-EXCELFILE* as mentioned above. 
+* Make a copy of the downloaded excelfile. Name one copy of the excelfile *REFERENCE-EXCELFILE.xlsx*. You should reuse the *REFERENCE-EXCELFILE.xlsx* for any further runs of this script. The *REFERENCE-EXCELFILE.xlsx* is maintained automatically by the script. If you want to know whether there are new versions of specifications available you just have do download the *LATEST-EXCELFILE.xlsx* as mentioned above. 
 * Then run this script as follows:
 
 ```
-python specificationsHandler.py LATEST-EXCELFILE REFERENCE-EXCELFILE
+python specificationsHandler.py LATEST-EXCELFILE.xlsx REFERENCE-EXCELFILE.xlsx
 ```
 
-* The script checks whether there is a specification in the *LATEST-EXCELFILE* which is not in the *REFERENCE-EXCELFILE*. If this is the case, the complete row will saved into the *REFERENCE-EXCELFILE*. The script also generates new columns for the version-number and the corresponding date. These columns refer to the online data.
-* Then, the specifications in the *REFERENCE-EXCELFILE* are distributed over several threads. Every thread connect the individual download-site of each specification and looks up which version and date is available.
-* After all threads are finished every specification version-number and date are compared with the looked up online verion-number and date. If there is a different version and date online than in the *REFERENCE-EXCELFILE*, the newest version will be downloaded.
+* The script checks whether there is a specification in the *LATEST-EXCELFILE.xlsx* which is not in the *REFERENCE-EXCELFILE.xlsx*. If this is the case, the complete row will saved into the *REFERENCE-EXCELFILE.xlsx*. The script also generates new columns for the version-number and the corresponding date. These columns refer to the online data.
+* Then, the specifications in the *REFERENCE-EXCELFILE.xlsx* are distributed over several threads. Every thread connect the individual download-site of each specification and looks up which version and date is available.
+* After all threads are finished every specification version-number and date are compared with the looked up online verion-number and date. If there is a different version and date online than in the *REFERENCE-EXCELFILE.xlsx*, the newest version will be downloaded.
 * All changed specifications will be downloaded. The zip-files are opened and if there is only one doc- or docx-file, this file will be converted to pdf and the doc- and zipfile will be deleted. Otherwise the zip-file has to be handled manually.
-* If the download of the zip-file was successful, the corresponding row of the specification in the *REFERENCE-EXCELFILE* will be updated.
+* If the download of the zip-file was successful, the corresponding row of the specification in the *REFERENCE-EXCELFILE.xlsx* will be updated.
 * In the last step there are a *check-txt*-file and a *log-file* generated with additionally information.
-* Use the *REFERENCE-EXCELFILE* for following updates. The only thing you have to do is to download the *LATEST-EXCELFILE* as described in the first step.
+* Use the *REFERENCE-EXCELFILE.xlsx* for following updates. The only thing you have to do is to download the *LATEST-EXCELFILE.xlsx* as described in the first step.
 
 **Attention!**
 The converting into pdf might take a while, especially when you use the script the first time and many zip-files are downloaded. 
 
 **Important remark:**
-Within the REFERENCE-EXCELFILE there will be columns generated with name *Version* and *Date* and *VersionTwo* and *DateTwo*. The data referring to these columns is retrieved online from the individual specification site. For example, consider the specification with id 36.300 --> https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=2430.
+Within the REFERENCE-EXCELFILE.xlsx there will be columns generated with name *Version* and *Date* and *VersionTwo* and *DateTwo*. The data referring to these columns is retrieved online from the individual specification site. For example, consider the specification with id 36.300 --> https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=2430.
 Choose the tab *Versions*. The versions are sorted by the release. In this case the columns *Version* and *Date* correspond to the release at the top and the latest published version, *VersionTwo* and *DateTwo* always correspond to the release which comes next to the first release. 
-Regarding to 36.300 the latest version (and date) of release 15 and release 14 would be checked and compared to the values which are saved in the REFERENCE-EXCELFILE. If there are newer versions available, it would be downloaded and the referring field in the column would be updated.
+Regarding to 36.300 the latest version (and date) of release 15 and release 14 would be checked and compared to the values which are saved in the REFERENCE-EXCELFILE.xlsx. If there are newer versions available, it would be downloaded and the referring field in the column would be updated.
 
 ## Usage of *pdfExtracter.py*
 * Be sure, there is a folder with name *Specifications* in the same directory as this script. 
@@ -67,11 +67,11 @@ Despite the usage of several threads for extracting the scope of each pdf the fi
 
 ## Usage of *specificationsToBib.py*
 * This script extracts the specifications within the *REFERENCE-ECXELFILE* into a bib-file.
-* With the optional parameter *-i* only the specifications will be extracted which are marked as important within the *REFERENCE-EXCELFILE*.
+* With the optional parameter *-i* only the specifications will be extracted which are marked as important within the *REFERENCE-EXCELFILE.xlsx*.
 * Because a specific specification can have several release versions, the version-number and the corresponding date is saved into the *note*-field.
 
 ```
-python specificationsToBib.py REFERENCE-EXCELFILE OUTPUT-BIBFILE [-i]
+python specificationsToBib.py REFERENCE-EXCELFILE.xlsx OUTPUT-BIBFILE [-i]
 ```
 
 ## Authors

@@ -67,7 +67,7 @@ Despite the usage of several threads for extracting the scope of each pdf the fi
 
 ## Usage of *specificationsToBib.py*
 * This script extracts the specifications within the *REFERENCE-ECXELFILE* into a bib-file.
-* With the optional parameter *-i* only the specifications will be extracted which are marked as important within the *REFERENCE-EXCELFILE.xlsx*.
+* With the optional parameter *-i* only the specifications will be extracted which are marked as important within the *REFERENCE-EXCELFILE.xlsx*. Important specifications can be marked within the column *important* in the *REFERENCE-EXCELFILE.xlsx*.
 * Because a specific specification can have several release versions, the version-number and the corresponding date is saved into the *note*-field.
 
 ```

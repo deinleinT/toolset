@@ -10,6 +10,23 @@ from bibtexparser.bibdatabase import BibDatabase
 import sys
 
 
+def toBibDatabase(number, version, date, url, title, types, dbArray):
+    if number == "0" or version == "0" or date == "0" or url == "None":    
+        return
+    entry = {
+            'ID': str(number + "V" + version + "D" + date),
+            'ENTRYTYPE': "techreport",
+            'title': title,
+            'type': types,
+            'author': "{3rd Generation Partnership Project (3GPP)}",
+            'number': number,
+            'note': version + ", " + __convertDateString(date),
+            'url': url
+        }
+    print("Bib-Entry created for Specification " + str(number + "V" + version + "D" + date))
+    dbArray.append(entry)
+
+
 def __convertDateString(datestring):
     year = datestring[4:]
     month = datestring[2:4] 
@@ -36,6 +53,9 @@ for row in ws.iter_rows(row_offset=1):
     dateOne = str(row[12].value)
     versionTwo = str(row[13].value)
     dateTwo = str(row[14].value)
+    versionThree = str(row[15].value)
+    dateThree = str(row[16].value)
+    
     try:
         url = str(row[0].hyperlink.target)
     except:
@@ -48,40 +68,9 @@ for row in ws.iter_rows(row_offset=1):
     except:
         pass
 
-# version one
-    if number == "0" or versionOne == "0" or dateOne == "0" or url == "None":
-        pass
-    else:
-        entry = {
-            'ID': str(number + "V" + versionOne + "D" + dateOne),
-            'ENTRYTYPE': "techreport",
-            'title': title,
-            'type': types,
-            'author': "{3rd Generation Partnership Project (3GPP)}",
-            'number': number,
-            'note': versionOne + ", " + __convertDateString(dateOne),
-            'url': url
-        }
-        print("Bib-Entry created for Specification " + str(number + "V" + versionOne + "D" + dateOne))
-        db.entries.append(entry)
-    
-# version tow
-    if number == "0" or versionTwo == "0" or dateTwo == "0" or url == "None":
-        pass
-    else:
-        entry = {
-            'ID': str(number + "V" + versionTwo + "D" + dateTwo),
-            'ENTRYTYPE': "techreport",
-            'title': title,
-            'type': types,
-            'author': "{3rd Generation Partnership Project (3GPP)}",
-            'number': number,
-            'note': versionTwo + ", " + __convertDateString(dateTwo),
-            'url': url
-        }
-        print("Bib-Entry created for Specification " + str(number + "V" + versionTwo + "D" + dateTwo))
-        db.entries.append(entry)
-
+    toBibDatabase(number, versionOne, dateOne, url, title, types, db.entries)
+    toBibDatabase(number, versionTwo, dateTwo, url, title, types, db.entries)
+    toBibDatabase(number, versionThree, dateThree, url, title, types, db.entries)
 writer = BibTexWriter()
 with open(filename, 'w') as bibfile:
     bibfile.write(writer.write(db))

@@ -8,12 +8,7 @@ The scripts are written in python. Version 3.6 or more up to date is needed. The
 Several python packages are needed as well. You can use the python package index (pip) for installing the needed packages as follows:
 
 ```
-pip install pywin32
-pip install openpyxl
-pip install lxml
-pip install requests
-pip install pypdf2
-pip install bibtexparser
+pip install pywin32 openpyxl lxml requests pypdf2 bibtexparser
 ```
 
 Infos regarding to python and the pip you'll find here: https://www.python.org/ or https://pypi.org/
@@ -30,7 +25,7 @@ Infos regarding to python and the pip you'll find here: https://www.python.org/ 
 * Then run this script as follows:
 
 ```
-python specificationsHandler.py LATEST-EXCELFILE.xlsx REFERENCE-EXCELFILE.xlsx
+python specificationsHandler.py LATEST-EXCELFILE.xlsx REFERENCE-EXCELFILE.xlsx [-3]
 ```
 
 * The script checks whether there is a specification in the *LATEST-EXCELFILE.xlsx* which is not in the *REFERENCE-EXCELFILE.xlsx*. If this is the case, the complete row will saved into the *REFERENCE-EXCELFILE.xlsx*. The script also generates new columns for the version-number and the corresponding date. These columns refer to the online data.
@@ -47,7 +42,7 @@ The converting into pdf might take a while, especially when you use the script t
 **Important remark:**
 Within the REFERENCE-EXCELFILE.xlsx there will be columns generated with name *Version* and *Date* and *VersionTwo* and *DateTwo*. The data referring to these columns is retrieved online from the individual specification site. For example, consider the specification with id 36.300 --> https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=2430.
 Choose the tab *Versions*. The versions are sorted by the release. In this case the columns *Version* and *Date* correspond to the release at the top and the latest published version, *VersionTwo* and *DateTwo* always correspond to the release which comes next to the first release. 
-Regarding to 36.300 the latest version (and date) of release 15 and release 14 would be checked and compared to the values which are saved in the REFERENCE-EXCELFILE.xlsx. If there are newer versions available, it would be downloaded and the referring field in the column would be updated.
+Regarding to 36.300 the latest version (and date) of release 15 and release 14 would be checked and compared to the values which are saved in the REFERENCE-EXCELFILE.xlsx. If there are newer versions available, it would be downloaded and the referring field in the column would be updated. It is also possible to check whether there is a third published release of a specification by passing the optional parameter *-3*.
 
 ## Usage of *pdfExtracter.py*
 * Be sure, there is a folder with name *Specifications* in the same directory as this script. 

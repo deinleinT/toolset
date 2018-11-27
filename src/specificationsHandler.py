@@ -18,20 +18,25 @@ from sys import exc_info
 
 class SpecInfo():
 
-    def __init__(self, spec, stype, title, status, primaryRespGrp, primaryRapporteur, initialPlannedRelease, publication, commonIMS, technology, important, versionOnlineOne, versionOnlineTwo, versionInXl, dateOnlineOne, dateOnlineTwo, dateInXl, urlOne, urlTwo, hyperlink, downloadOne, downloadTwo, notInOne, releaseOnlineOne, releaseOnlineTwo, versionInXlTwo, dateInXlTwo):
+    def __init__(self, spec, stype, title, status, primaryRespGrp, primaryRapporteur, initialPlannedRelease, publication, commonIMS, technology, important, versionOnlineOne, versionOnlineTwo, versionInXl, dateOnlineOne, dateOnlineTwo, dateInXl, urlOne, urlTwo, hyperlink, downloadOne, downloadTwo, notInOne, releaseOnlineOne, releaseOnlineTwo, versionInXlTwo, dateInXlTwo, versionOnlineThree, versionInXlThree, downloadThree, dateOnlineThree, dateInXlThree, urlThree, releaseOnlineThree):
         self.spec = spec
         self.title = title
         self.stype = stype
         self.versionOnlineOne = versionOnlineOne
         self.versionOnlineTwo = versionOnlineTwo
+        self.versionOnlineThree = versionOnlineThree
         self.versionInXl = versionInXl
         self.versionInXlTwo = versionInXlTwo
+        self.versionInXlThree = versionInXlThree
         self.dateOnlineOne = dateOnlineOne
         self.dateOnlineTwo = dateOnlineTwo
+        self.dateOnlineThree = dateOnlineThree
         self.dateInXl = dateInXl
         self.dateInXlTwo = dateInXlTwo
+        self.dateInXlThree = dateInXlThree
         self.urlOne = urlOne
-        self.urlTwo = urlTwo  
+        self.urlTwo = urlTwo
+        self.urlThree = urlThree  
         self.status = status
         self.primaryRespGrp = primaryRespGrp
         self.primaryRapporteur = primaryRapporteur
@@ -43,9 +48,11 @@ class SpecInfo():
         self.hyperlink = hyperlink
         self.downloadOne = downloadOne
         self.downloadTwo = downloadTwo
+        self.downloadThree = downloadThree
         self.notInOne = notInOne
         self.releaseOnlineOne = releaseOnlineOne
         self.releaseOnlineTwo = releaseOnlineTwo
+        self.releaseOnlineThree = releaseOnlineThree
 
 
 def currentUpdate(standardNumber, kind):
@@ -78,6 +85,10 @@ def currentUpdate(standardNumber, kind):
                 print("Update Version TWO")
                 row[13].value = specs[str(number)].versionOnlineTwo
                 row[14].value = specs[str(number)].dateOnlineTwo
+            elif kind == "three":
+                print("Update Version THREE")
+                row[15].value = specs[str(number)].versionOnlineThree
+                row[16].value = specs[str(number)].dateOnlineThree
         
     wb2.save(initial[2])
     wb2.close()
@@ -226,6 +237,8 @@ def extractAndConvert():
             currentUpdate(standard, "one")
         elif str(specs[standard].downloadTwo) == "1" and str(specs[standard].releaseOnlineTwo) in name:
             currentUpdate(standard, "two")
+        elif str(specs[standard].downloadThree) == "1" and str(specs[standard].releaseOnlineThree) in name:
+            currentUpdate(standard, "three")
         pdfcounter += 1           
     return 
 
@@ -381,7 +394,48 @@ class fileTwo(threading.Thread):
                         
                 except Exception as e:
                     logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
-
+            # end two
+            # three
+            if checkThree:
+                for release in range(2, 3):
+                    try:
+                        try:
+                            rowThree = tree.xpath(
+                            '//tr[@id="SpecificationReleaseControl1_rpbReleases_i{}_ctl00_specificationsVersionGrid_ctl00__0"]/td/div/a'
+                            .format(release))
+                            dateRowThree = tree.xpath(
+                                '//tr[@id="SpecificationReleaseControl1_rpbReleases_i{}_ctl00_specificationsVersionGrid_ctl00__0"]/td'
+                                .format(release))
+                            
+                            try:
+                                rowReleaseThree = tree.xpath('//span[contains(@id,"SpecificationReleaseControl1_rpbReleases_i{}_HeaderTemplate_ctl00_lblReleaseName")]'.format(release))
+                                self.__specs[specification].releaseOnlineThree = rowReleaseThree[0].text.replace(' ', '')
+                            except Exception as e:
+                                self.__specs[specification].releaseOnlineThree = ""
+                                logstring.append("\n No Release-Version for " + str(specification) + " available! " + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
+                            
+                            self.__specs[specification].versionOnlineThree = "{}".format(rowThree[1].text.strip())
+                            if dateRowThree[2].text.strip() is not "":
+                                date = dateRowThree[2].text.split('-')
+                                day = date[2].strip()
+                                year = date[0].strip()
+                                month = date[1].strip()
+                                self.__specs[specification].dateOnlineThree = day + month + year
+                            else:
+                                self.__specs[specification].dateOnlineThree = "0"
+                            
+                        except Exception as e:
+                            logstring.append("\n No URL-Link for " + str(specification) + " available! " + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
+                            
+                        try:
+                            self.__specs[specification].urlThree = str(rowThree[1].attrib["href"])
+                            
+                        except Exception as e:
+                            logstring.append("\n No URL-Link for " + str(specification) + " available! " + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
+                            
+                    except Exception as e:
+                        logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
+                # end three
         print("\n\n\n")
         print("Processing of " + str(threading.current_thread().getName()) + " is finished!\n\n\n") 
         wb2.close()
@@ -400,7 +454,20 @@ class DownloadZIPs(threading.Thread):
         sortedKeys = sorted(self.__specs)      
     
         for key in sortedKeys:
-            if self.__kind == "two" and self.__specs[key].downloadTwo == "1":
+            if self.__kind == "three" and self.__specs[key].downloadThree == "1" and checkThree:
+                directory = self.__specs[key].spec + "_" + self.__specs[key].versionOnlineThree + "_" + self.__specs[key].dateOnlineThree + "_" + self.__specs[key].releaseOnlineThree + ".zip"
+                try:
+                    result = download(self.__specs[key].urlThree, directory)
+                    if result:
+                        print("File " + directory + " created!\n")  
+                    else:
+                        self.__failed.add(str(key)) 
+                        print("Download file " + directory + " FAILED!\n")                 
+                except Exception as e:
+                    self.__failed.add(str(key)) 
+                    logstring.append("\n" + str(e) + " " + "Download file " + directory + " FAILED!\n" + "ERROR in downloadZIpsRUN" + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
+           
+            elif self.__kind == "two" and self.__specs[key].downloadTwo == "1":
                 directory = self.__specs[key].spec + "_" + self.__specs[key].versionOnlineTwo + "_" + self.__specs[key].dateOnlineTwo + "_" + self.__specs[key].releaseOnlineTwo + ".zip"
                 try:
                     result = download(self.__specs[key].urlTwo, directory)
@@ -436,6 +503,14 @@ logstring = []
 initial.append(sys.argv[0])
 initial.append(sys.argv[1])
 initial.append(sys.argv[2])
+##################################################################################################################################################################
+checkThree = False
+try:
+    if sys.argv[3] == "-3":
+        checkThree = True
+except:
+    pass    
+####################################################################################################################################################################
 
 specs = dict()
 noUpdate = set()
@@ -471,19 +546,26 @@ for row in iterOne:
                                             important="",
                                             versionOnlineOne="0",
                                             versionOnlineTwo="0",
+                                            versionOnlineThree="0",
                                             versionInXl="0",
                                             dateOnlineOne="0",
                                             dateOnlineTwo="0",
+                                            dateOnlineThree="0",
                                             dateInXl="0",
                                             urlOne="",
                                             urlTwo="",
+                                            urlThree="",
                                             downloadOne="0",
                                             downloadTwo="0",
+                                            downloadThree="0",
                                             notInOne="0",
                                             releaseOnlineOne="",
                                             releaseOnlineTwo="",
+                                            releaseOnlineThree="",
                                             versionInXlTwo="0",
-                                            dateInXlTwo="0")
+                                            versionInXlThree="0",
+                                            dateInXlTwo="0",
+                                            dateInXlThree="0")
     except Exception as e:
         logstring.append("\n No URL-Link for " + str(row[0].value) + " available! " + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
 
@@ -512,25 +594,35 @@ for row in iterTwo:
                                             important="" if str(row[10].value) == "None" else str(row[10].value),
                                             versionOnlineOne="0",
                                             versionOnlineTwo="0",
+                                            versionOnlineThree="0",
                                             versionInXl="0" if str(row[11].value) == "None" else str(row[11].value),
                                             dateOnlineOne="0",
                                             dateOnlineTwo="0",
+                                            dateOnlineThree="0",
                                             dateInXl="0" if str(row[12].value) == "None" else str(row[12].value),
                                             urlOne="",
                                             urlTwo="",
+                                            urlThree="",
                                             downloadOne="0",
                                             downloadTwo="0",
+                                            downloadThree="0",
                                             notInOne="1",
                                             releaseOnlineOne="",
                                             releaseOnlineTwo="",
+                                            releaseOnlineThree="",
                                             versionInXlTwo="0" if str(row[13].value) == "None" else str(row[13].value),
-                                            dateInXlTwo="0" if str(row[14].value) == "None" else str(row[14].value))
+                                            versionInXlThree="0" if str(row[15].value) == "None" else str(row[15].value),
+                                            dateInXlTwo="0" if str(row[14].value) == "None" else str(row[14].value),
+                                            dateInXlThree="0" if str(row[16].value) == "None" else str(row[16].value)
+                                            )
         else:
             specs[number].important = "" if str(row[10].value) == "None" else str(row[10].value)
             specs[number].versionInXl = "0" if str(row[11].value) == "None" else str(row[11].value)
             specs[number].dateInXl = "0" if str(row[12].value) == "None" else str(row[12].value)
             specs[number].versionInXlTwo = "0" if str(row[13].value) == "None" else str(row[13].value)
             specs[number].dateInXlTwo = "0" if str(row[14].value) == "None" else str(row[14].value)
+            specs[number].versionInXlThree = "0" if str(row[15].value) == "None" else str(row[15].value)
+            specs[number].dateInXlThree = "0" if str(row[16].value) == "None" else str(row[16].value)
                         
     except Exception as e:
         logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
@@ -555,6 +647,8 @@ for specification in standardsInOne:
             wsTwo.cell(row=rowCounter, column=13).value = specs[specification].dateInXl
             wsTwo.cell(row=rowCounter, column=14).value = specs[specification].versionInXlTwo
             wsTwo.cell(row=rowCounter, column=15).value = specs[specification].dateInXlTwo
+            wsTwo.cell(row=rowCounter, column=16).value = specs[specification].versionInXlThree
+            wsTwo.cell(row=rowCounter, column=17).value = specs[specification].dateInXlThree
             wbTwo.save(initial[2])
             rowCounter += 1
         except Exception as e:
@@ -584,6 +678,8 @@ versionCol = 12
 dateCol = 13
 versionCol2 = 14
 dateCol2 = 15
+versionCol3 = 16
+dateCol3 = 17
 changeSecondExcelSheet = False
 counter = 0
 
@@ -592,6 +688,8 @@ ws.cell(row=1, column=versionCol).value = "Version"
 ws.cell(row=1, column=dateCol).value = "Date"
 ws.cell(row=1, column=versionCol2).value = "VersionTwo"
 ws.cell(row=1, column=dateCol2).value = "DateTwo"
+ws.cell(row=1, column=versionCol3).value = "VersionThree"
+ws.cell(row=1, column=dateCol3).value = "DateThree"
 wb3.save(initial[2])
 myIter = ws.iter_rows(row_offset=1, min_row=0, max_row=ws.max_row)
 
@@ -698,6 +796,20 @@ for row in myIter:
     except Exception as e:
         logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
         ws.cell(row=currentRow, column=15).value = "0"
+        
+    try:
+        if str(row[15].value) == "None" or str(row[15].value) == "":
+            row[15].value = "0"
+    except Exception as e:
+        logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
+        ws.cell(row=currentRow, column=16).value = "0"
+    
+    try:
+        if str(row[16].value) == "None" or str(row[16].value) == "":
+            row[16].value = "0"
+    except Exception as e:
+        logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
+        ws.cell(row=currentRow, column=17).value = "0"
 
 wb3.save(initial[2])
 wb3.close()
@@ -740,18 +852,25 @@ for number in sorted(specs):
     number = str(number)
     versionInXl = specs[number].versionInXl
     versionInXlTwo = specs[number].versionInXlTwo
+    versionInXlThree = specs[number].versionInXlThree
     versionOnlineOne = specs[number].versionOnlineOne
     versionOnlineTwo = specs[number].versionOnlineTwo
+    versionOnlineThree = specs[number].versionOnlineThree
     dateInXl = specs[number].dateInXl
     dateInXlTwo = specs[number].dateInXlTwo
+    dateInXlThree = specs[number].dateInXlThree
     dateOnlineOne = specs[number].dateOnlineOne
     dateOnlineTwo = specs[number].dateOnlineTwo
+    dateOnlineThree = specs[number].dateOnlineThree
     title = specs[number].title
     important = specs[number].important
     notInOne = specs[number].notInOne
     releaseOnlineOne = specs[number].releaseOnlineOne
     releaseOnlineTwo = specs[number].releaseOnlineTwo
+    releaseOnlineThree = specs[number].releaseOnlineThree
     urlOne = specs[number].urlOne
+    urlTwo = specs[number].urlTwo
+    urlThree = specs[number].urlThree
 
     if notInOne == "1":
         outputString.append(str(number) + " not in " + initial[1] + "\n")
@@ -802,6 +921,30 @@ for number in sorted(specs):
             except Exception as e:
                 logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "Error adding key " + str(number) + " to downloadZips" + "\n")
                 noUpdate.add(str(number))
+                
+    if checkThree:
+        if versionInXlThree == versionOnlineThree and dateInXlThree == dateOnlineThree:
+            pass
+        else:
+            if versionOnlineThree == "0" or dateOnlineThree == "0" or versionOnlineThree == "None" or dateOnlineThree == "" or versionOnlineThree == "None" or dateOnlineThree == "":
+                outputString.append("\n*** Check MANUALLY Version Three!!! ***")
+                outputString.append("" + releaseOnlineThree)
+                outputString.append(str(number) + " in " + str(initial[2]) + " has different Version than Online! " + str(versionInXlThree) + " != " + str(versionOnlineThree))
+                outputString.append(str(number) + " in " + str(initial[2]) + " has different Date than Online! " + str(dateInXlThree) + " != " + str(dateOnlineThree))
+                outputString.append("***\n")
+                standardsToCheck.append(number)
+            else:
+                outputString.append("" + releaseOnlineThree)
+                outputString.append(str(number) + " in " + str(initial[2]) + " has different Version than Online! " + str(versionInXlThree) + " != " + str(versionOnlineThree))
+                if number not in standardsToCheck:
+                    standardsToCheck.append(number)
+                outputString.append(str(number) + " in " + str(initial[2]) + " has different Date than Online! " + str(dateInXlThree) + " != " + str(dateOnlineThree) + "\n")
+                try:
+                    if specs[number].urlThree != "None" and specs[number].urlThree != "":
+                        specs[number].downloadThree = "1"
+                except Exception as e:
+                    logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "Error adding key " + str(number) + " to downloadZips" + "\n")
+                    noUpdate.add(str(number))
  
 datumDifference += time.strftime("%d%m%Y%H%M") + ".txt"
 logFileName += time.strftime("%d%m%Y%H%M") + ".txt"
@@ -826,7 +969,12 @@ print("\n\n****************************File " + datumDifference + " saved!******
 print("\nStarting Saving the zips\n")
 t1 = DownloadZIPs(specs, noUpdate, failed, "one")
 t2 = DownloadZIPs(specs, noUpdate, failed , "two")
-thAr = [t1, t2]
+
+if checkThree:
+    t3 = DownloadZIPs(specs, noUpdate, failed, "three")
+    thAr = [t1, t2, t3]
+else:
+    thAr = [t1, t2]
 for t in thAr:
     t.start()
 

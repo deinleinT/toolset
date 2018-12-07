@@ -175,7 +175,7 @@ out.write("\n\n")
 out.write("-------------------------------------------------------------------------------------------------------------------------------------\n\n")
 for s in sorted(allScopes):
     out.write("PDF: " + s + "\n\n")
-    out.write("Title: " + str(allTitles[s]) + "\n\n")
+    out.write("Title: " + str(allTitles.get(s," *** ERROR OCCURED ***")) + "\n\n")
     out.write("All Text from " + start + ":\n")
     try:
         out.write(str(allScopes[s]))

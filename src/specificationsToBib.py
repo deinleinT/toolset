@@ -10,7 +10,7 @@ from bibtexparser.bibdatabase import BibDatabase
 import sys
 
 
-def toBibDatabase(number, version, date, url, title, types, dbArray):
+def toBibDatabase(number, version, date, release, url, title, types, dbArray):
     if number == "0" or version == "0" or date == "0" or url == "None":    
         return
     entry = {
@@ -20,11 +20,17 @@ def toBibDatabase(number, version, date, url, title, types, dbArray):
             'type': types,
             'author': "{3rd Generation Partnership Project (3GPP)}",
             'number': number,
-            'note': version + ", " + __convertDateString(date),
+            'note': __convertReleaseString(release) + ", Version: " + version + ", Published: " + __convertDateString(date),
             'url': url
         }
     print("Bib-Entry created for Specification " + str(number + "V" + version + "D" + date))
     dbArray.append(entry)
+
+
+def __convertReleaseString(releasestring):
+    rel = releasestring[0:7]
+    num = releasestring[7:]
+    return rel + " " + num
 
 
 def __convertDateString(datestring):
@@ -55,6 +61,9 @@ for row in ws.iter_rows(row_offset=1):
     dateTwo = str(row[14].value)
     versionThree = str(row[15].value)
     dateThree = str(row[16].value)
+    releaseOne = str(row[17].value)
+    releaseTwo = str(row[18].value)
+    releaseThree = str(row[19].value)
     
     try:
         url = str(row[0].hyperlink.target)
@@ -68,9 +77,9 @@ for row in ws.iter_rows(row_offset=1):
     except:
         pass
 
-    toBibDatabase(number, versionOne, dateOne, url, title, types, db.entries)
-    toBibDatabase(number, versionTwo, dateTwo, url, title, types, db.entries)
-    toBibDatabase(number, versionThree, dateThree, url, title, types, db.entries)
+    toBibDatabase(number, versionOne, dateOne, releaseOne, url, title, types, db.entries)
+    toBibDatabase(number, versionTwo, dateTwo, releaseTwo, url, title, types, db.entries)
+    toBibDatabase(number, versionThree, dateThree, releaseThree, url, title, types, db.entries)
 writer = BibTexWriter()
 with open(filename, 'w') as bibfile:
     bibfile.write(writer.write(db))

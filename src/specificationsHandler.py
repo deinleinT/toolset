@@ -18,7 +18,7 @@ from sys import exc_info
 
 class SpecInfo():
 
-    def __init__(self, spec, stype, title, status, primaryRespGrp, primaryRapporteur, initialPlannedRelease, publication, commonIMS, technology, important, versionOnlineOne, versionOnlineTwo, versionInXl, dateOnlineOne, dateOnlineTwo, dateInXl, urlOne, urlTwo, hyperlink, downloadOne, downloadTwo, notInOne, releaseOnlineOne, releaseOnlineTwo, versionInXlTwo, dateInXlTwo, versionOnlineThree, versionInXlThree, downloadThree, dateOnlineThree, dateInXlThree, urlThree, releaseOnlineThree):
+    def __init__(self, spec, stype, title, status, primaryRespGrp, primaryRapporteur, initialPlannedRelease, publication, commonIMS, technology, important, versionOnlineOne, versionOnlineTwo, versionInXl, dateOnlineOne, dateOnlineTwo, dateInXl, urlOne, urlTwo, hyperlink, downloadOne, downloadTwo, notInOne, releaseOnlineOne, releaseOnlineTwo, versionInXlTwo, dateInXlTwo, versionOnlineThree, versionInXlThree, downloadThree, dateOnlineThree, dateInXlThree, urlThree, releaseOnlineThree, releaseInXLOne, releaseInXLTwo, releaseInXLThree):
         self.spec = spec
         self.title = title
         self.stype = stype
@@ -53,6 +53,9 @@ class SpecInfo():
         self.releaseOnlineOne = releaseOnlineOne
         self.releaseOnlineTwo = releaseOnlineTwo
         self.releaseOnlineThree = releaseOnlineThree
+        self.releaseInXLOne = releaseOnlineOne
+        self.releaseInXLTwo = releaseInXLTwo
+        self.releaseInXLThree = releaseInXLThree
 
 
 def currentUpdate(standardNumber, kind):
@@ -81,14 +84,17 @@ def currentUpdate(standardNumber, kind):
                 print("Update Version ONE")
                 row[11].value = specs[str(number)].versionOnlineOne
                 row[12].value = specs[str(number)].dateOnlineOne
+                row[17].value = specs[str(number)].releaseOnlineOne
             elif kind == "two":
                 print("Update Version TWO")
                 row[13].value = specs[str(number)].versionOnlineTwo
                 row[14].value = specs[str(number)].dateOnlineTwo
+                row[18].value = specs[str(number)].releaseOnlineTwo
             elif kind == "three":
                 print("Update Version THREE")
                 row[15].value = specs[str(number)].versionOnlineThree
                 row[16].value = specs[str(number)].dateOnlineThree
+                row[19].value = specs[str(number)].releaseOnlineThree
         
     wb2.save(initial[2])
     wb2.close()
@@ -565,7 +571,10 @@ for row in iterOne:
                                             versionInXlTwo="0",
                                             versionInXlThree="0",
                                             dateInXlTwo="0",
-                                            dateInXlThree="0")
+                                            dateInXlThree="0",
+                                            releaseInXLOne="0",
+                                            releaseInXLTwo="0",
+                                            releaseInXLThree="0")
     except Exception as e:
         logstring.append("\n No URL-Link for " + str(row[0].value) + " available! " + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
 
@@ -613,8 +622,10 @@ for row in iterTwo:
                                             versionInXlTwo="0" if str(row[13].value) == "None" else str(row[13].value),
                                             versionInXlThree="0" if str(row[15].value) == "None" else str(row[15].value),
                                             dateInXlTwo="0" if str(row[14].value) == "None" else str(row[14].value),
-                                            dateInXlThree="0" if str(row[16].value) == "None" else str(row[16].value)
-                                            )
+                                            dateInXlThree="0" if str(row[16].value) == "None" else str(row[16].value),
+                                            releaseInXLOne="0" if str(row[17].value) == "None" else str(row[17].value),
+                                            releaseInXLTwo="0" if str(row[18].value) == "None" else str(row[18].value),
+                                            releaseInXLThree="0" if str(row[19].value) == "None" else str(row[19].value))
         else:
             specs[number].important = "" if str(row[10].value) == "None" else str(row[10].value)
             specs[number].versionInXl = "0" if str(row[11].value) == "None" else str(row[11].value)
@@ -623,6 +634,9 @@ for row in iterTwo:
             specs[number].dateInXlTwo = "0" if str(row[14].value) == "None" else str(row[14].value)
             specs[number].versionInXlThree = "0" if str(row[15].value) == "None" else str(row[15].value)
             specs[number].dateInXlThree = "0" if str(row[16].value) == "None" else str(row[16].value)
+            specs[number].releaseInXLOne = "0" if str(row[17].value) == "None" else str(row[17].value)
+            specs[number].releaseInXLTwo = "0" if str(row[18].value) == "None" else str(row[18].value)
+            specs[number].releaseInXLThree = "0" if str(row[19].value) == "None" else str(row[19].value)
                         
     except Exception as e:
         logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
@@ -649,6 +663,9 @@ for specification in standardsInOne:
             wsTwo.cell(row=rowCounter, column=15).value = specs[specification].dateInXlTwo
             wsTwo.cell(row=rowCounter, column=16).value = specs[specification].versionInXlThree
             wsTwo.cell(row=rowCounter, column=17).value = specs[specification].dateInXlThree
+            wsTwo.cell(row=rowCounter, column=18).value = specs[specification].releaseInXLOne
+            wsTwo.cell(row=rowCounter, column=19).value = specs[specification].releaseInXLTwo
+            wsTwo.cell(row=rowCounter, column=20).value = specs[specification].releaseInXLThree
             wbTwo.save(initial[2])
             rowCounter += 1
         except Exception as e:
@@ -680,6 +697,9 @@ versionCol2 = 14
 dateCol2 = 15
 versionCol3 = 16
 dateCol3 = 17
+relCol = 18
+relCol2 = 19
+relCol3 = 20
 changeSecondExcelSheet = False
 counter = 0
 
@@ -690,6 +710,9 @@ ws.cell(row=1, column=versionCol2).value = "VersionTwo"
 ws.cell(row=1, column=dateCol2).value = "DateTwo"
 ws.cell(row=1, column=versionCol3).value = "VersionThree"
 ws.cell(row=1, column=dateCol3).value = "DateThree"
+ws.cell(row=1, column=relCol).value = "ReleaseOne"
+ws.cell(row=1, column=relCol2).value = "ReleaseTwo"
+ws.cell(row=1, column=relCol3).value = "ReleaseThree"
 wb3.save(initial[2])
 myIter = ws.iter_rows(row_offset=1, min_row=0, max_row=ws.max_row)
 
@@ -810,6 +833,27 @@ for row in myIter:
     except Exception as e:
         logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
         ws.cell(row=currentRow, column=17).value = "0"
+    
+    try:
+        if str(row[17].value) == "None" or str(row[17].value) == "":
+            row[17].value = "0"
+    except Exception as e:
+        logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
+        ws.cell(row=currentRow, column=18).value = "0"
+    
+    try:
+        if str(row[18].value) == "None" or str(row[18].value) == "":
+            row[18].value = "0"
+    except Exception as e:
+        logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
+        ws.cell(row=currentRow, column=19).value = "0"
+    
+    try:
+        if str(row[19].value) == "None" or str(row[19].value) == "":
+            row[19].value = "0"
+    except Exception as e:
+        logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
+        ws.cell(row=currentRow, column=20).value = "0"
 
 wb3.save(initial[2])
 wb3.close()
@@ -868,6 +912,9 @@ for number in sorted(specs):
     releaseOnlineOne = specs[number].releaseOnlineOne
     releaseOnlineTwo = specs[number].releaseOnlineTwo
     releaseOnlineThree = specs[number].releaseOnlineThree
+    releaseInXLOne = specs[number].releaseInXLOne
+    releaseInXLTwo = specs[number].releaseInXLTwo
+    releaseInXLThree = specs[number].releaseInXLThree
     urlOne = specs[number].urlOne
     urlTwo = specs[number].urlTwo
     urlThree = specs[number].urlThree

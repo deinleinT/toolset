@@ -666,11 +666,11 @@ for specification in standardsInOne:
             wsTwo.cell(row=rowCounter, column=18).value = specs[specification].releaseInXLOne
             wsTwo.cell(row=rowCounter, column=19).value = specs[specification].releaseInXLTwo
             wsTwo.cell(row=rowCounter, column=20).value = specs[specification].releaseInXLThree
-            wbTwo.save(initial[2])
             rowCounter += 1
         except Exception as e:
             logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + " " + str(specification) + "\n")
             
+wbTwo.save(initial[2])
 wbOne.close()
 wbTwo.close()
 standardsInOne.clear()

@@ -61,7 +61,7 @@ class SpecInfo():
 def currentUpdate(standardNumber, kind):
     
     print("Updating-Process of Specification-ID " + str(standardNumber) + " started...") 
-    wb2 = load_workbook(initial[2])
+    wb2 = load_workbook(sys.argv[2])
     sheetnames = wb2.sheetnames
     ws = wb2[sheetnames[0]]
     myIter = ws.iter_rows(row_offset=1)
@@ -96,7 +96,7 @@ def currentUpdate(standardNumber, kind):
                 row[16].value = specs[str(number)].dateOnlineThree
                 row[19].value = specs[str(number)].releaseOnlineThree
         
-    wb2.save(initial[2])
+    wb2.save(sys.argv[2])
     wb2.close()
     print("Updating-Process of Specification-ID " + str(standardNumber) + " finished!\n")
 

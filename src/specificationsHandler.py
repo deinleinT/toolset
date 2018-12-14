@@ -139,7 +139,7 @@ def __convert_to_pdf(doc, newName):
         return flag
     
 
-def extractZipFilesAndConvertToPDF(nameZip, destination):
+def extractZipFilesAndConvertToPDF(nameZip, destination, onlyWordFiles):
     
     nameZipFile = destination + "/" + nameZip
     converted = False
@@ -174,7 +174,8 @@ def extractZipFilesAndConvertToPDF(nameZip, destination):
                         noUpdate.add(str(standard))
                     
                     if os.path.isfile(destination + "/" + docname):
-                        converted = __convert_to_pdf(destination + "/" + docname, newName)
+                        if not onlyWordFiles:
+                            converted = __convert_to_pdf(destination + "/" + docname, newName)
                         if not converted:
                             if not extracted:
                                 print("Extract and Convert Failed, hence add to noUpdate " + newName)
@@ -191,7 +192,7 @@ def extractZipFilesAndConvertToPDF(nameZip, destination):
         else:
             print("Did not extract " + nameZip + " (e.g., there is more than one file within the zip) but updated the entry in the Excel-Sheet!!!")
             return 
-    if os.path.isfile(nameZipFile) and converted:
+    if os.path.isfile(nameZipFile) and (converted or extracted):
         os.remove(nameZipFile) 
         print("Zip-File " + nameZipFile + " removed!")   
         return
@@ -234,7 +235,7 @@ def extractAndConvert():
             continue
         try:
             print("Try to extract " + name)
-            extractZipFilesAndConvertToPDF(name, pathname)
+            extractZipFilesAndConvertToPDF(name, pathname, onlyWordFiles)
             print("Unzipping of " + name + " finished!\n")
         except Exception as e:
             logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
@@ -503,25 +504,24 @@ class DownloadZIPs(threading.Thread):
 
 #############################################################################################
 #################Programm Start##############################################################
-initial = []
 logstring = []
 
-initial.append(sys.argv[0])
-initial.append(sys.argv[1])
-initial.append(sys.argv[2])
 ##################################################################################################################################################################
 checkThree = False
-try:
-    if sys.argv[3] == "-3":
-        checkThree = True
-except:
-    pass    
+if "-3" in sys.argv:
+    checkThree = True
+print("CHECK 3 : " + str(checkThree))  
 ####################################################################################################################################################################
+onlyWordFiles = False
+if "-w" in sys.argv:
+    onlyWordFiles = True
+print("OnlyWord : " + str(onlyWordFiles))
+#####################################################################################################################################################################
 
 specs = dict()
 noUpdate = set()
-datumDifference = "checkSpecificationsBetween" + initial[1] + "And" + initial[2] + time.strftime("%d%m%Y%H%M") + "_"
-logFileName = "LogFile" + initial[1] + "And" + initial[2] + time.strftime("%d%m%Y%H%M") + "_"
+datumDifference = "checkSpecificationsBetween" + sys.argv[1] + "And" + sys.argv[2] + time.strftime("%d%m%Y%H%M") + "_"
+logFileName = "LogFile" + sys.argv[1] + "And" + sys.argv[2] + time.strftime("%d%m%Y%H%M") + "_"
 
 #############################################################################################
 threadLock = threading.Lock()
@@ -530,7 +530,7 @@ numberThreads = _getThreads() * 2
 print("\n*** Using " + str(numberThreads) + " Threads for comparing the versions of all specifications in the Excel-Sheets... ***\n")
 ##################################################
 #
-wbOne = load_workbook(initial[1])
+wbOne = load_workbook(sys.argv[1])
 sheetnames = wbOne.sheetnames
 wsOne = wbOne[sheetnames[0]]
 standardsInOne = []
@@ -579,7 +579,7 @@ for row in iterOne:
         logstring.append("\n No URL-Link for " + str(row[0].value) + " available! " + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
 
 specs.pop('None', None)
-wbTwo = load_workbook(initial[2])
+wbTwo = load_workbook(sys.argv[2])
 sheetnames = wbTwo.sheetnames
 wsTwo = wbTwo[sheetnames[0]]
 standardsInTwo = []
@@ -670,20 +670,20 @@ for specification in standardsInOne:
         except Exception as e:
             logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + " " + str(specification) + "\n")
             
-wbTwo.save(initial[2])
+wbTwo.save(sys.argv[2])
 wbOne.close()
 wbTwo.close()
 standardsInOne.clear()
 standardsInTwo.clear()
 ##################################################
 
-wb2 = load_workbook(initial[1])
+wb2 = load_workbook(sys.argv[1])
 sheetnames = wb2.sheetnames
 ws = wb2[sheetnames[0]]
 maxFirst = ws.max_row
 wb2.close()
 
-wb3 = load_workbook(initial[2])
+wb3 = load_workbook(sys.argv[2])
 sheetnames = wb3.sheetnames
 ws = wb3[sheetnames[0]]
 maxSecond = ws.max_row
@@ -713,7 +713,7 @@ ws.cell(row=1, column=dateCol3).value = "DateThree"
 ws.cell(row=1, column=relCol).value = "ReleaseOne"
 ws.cell(row=1, column=relCol2).value = "ReleaseTwo"
 ws.cell(row=1, column=relCol3).value = "ReleaseThree"
-wb3.save(initial[2])
+wb3.save(sys.argv[2])
 myIter = ws.iter_rows(row_offset=1, min_row=0, max_row=ws.max_row)
 
 for row in myIter:
@@ -855,7 +855,7 @@ for row in myIter:
         logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
         ws.cell(row=currentRow, column=20).value = "0"
 
-wb3.save(initial[2])
+wb3.save(sys.argv[2])
 wb3.close()
 
 #
@@ -867,7 +867,7 @@ intervalTwo = round(maxSecond / numberThreads)
 if intervalTwo == 0:
     intervalTwo = 1;
 
-thread2 = fileTwo(initial[2], True, startTwo, startTwo + intervalTwo, noUpdate, specs)
+thread2 = fileTwo(sys.argv[2], True, startTwo, startTwo + intervalTwo, noUpdate, specs)
 startTwo += intervalTwo
 
 threads.append(thread2)
@@ -876,7 +876,7 @@ while startTwo < maxSecond:
     endTwo = startTwo + intervalTwo
     if endTwo > maxSecond:
         endTwo = maxSecond
-    threads.append(fileTwo(initial[2], False, startTwo, endTwo, noUpdate, specs))  
+    threads.append(fileTwo(sys.argv[2], False, startTwo, endTwo, noUpdate, specs))  
     startTwo = endTwo 
 
 for t in threads:
@@ -920,7 +920,7 @@ for number in sorted(specs):
     urlThree = specs[number].urlThree
 
     if notInOne == "1":
-        outputString.append(str(number) + " not in " + initial[1] + "\n")
+        outputString.append(str(number) + " not in " + sys.argv[1] + "\n")
         standardsToCheck.append(str(number))
     
     if versionInXl == versionOnlineOne and dateInXl == dateOnlineOne:
@@ -929,16 +929,16 @@ for number in sorted(specs):
         if versionOnlineOne == "0" or dateOnlineOne == "0" or dateOnlineOne == "None" or dateOnlineOne == "" or versionOnlineOne == "None" or versionOnlineOne == "":
             outputString.append("\n*** Check MANUALLY Version One!!! ***")
             outputString.append("" + releaseOnlineOne)
-            outputString.append(str(number) + " in " + str(initial[2]) + " has different Version than Online! " + str(versionInXl) + " != " + str(versionOnlineOne))
-            outputString.append(str(number) + " in " + str(initial[2]) + " has different Date than Online! " + str(dateInXl) + " != " + str(dateOnlineOne))
+            outputString.append(str(number) + " in " + str(sys.argv[2]) + " has different Version than Online! " + str(versionInXl) + " != " + str(versionOnlineOne))
+            outputString.append(str(number) + " in " + str(sys.argv[2]) + " has different Date than Online! " + str(dateInXl) + " != " + str(dateOnlineOne))
             outputString.append("***\n")
             standardsToCheck.append(number)
         else:
             outputString.append("" + releaseOnlineOne)
-            outputString.append(str(number) + " in " + str(initial[2]) + " has different Version than Online! " + str(versionInXl) + " != " + str(versionOnlineOne))
+            outputString.append(str(number) + " in " + str(sys.argv[2]) + " has different Version than Online! " + str(versionInXl) + " != " + str(versionOnlineOne))
             if number not in standardsToCheck:
                 standardsToCheck.append(number)
-            outputString.append(str(number) + " in " + str(initial[2]) + " has different Date than Online! " + str(dateInXl) + " != " + str(dateOnlineOne) + "\n")
+            outputString.append(str(number) + " in " + str(sys.argv[2]) + " has different Date than Online! " + str(dateInXl) + " != " + str(dateOnlineOne) + "\n")
             try:
                 if specs[number].urlOne != "None" and specs[number].urlOne != "":
                     specs[number].downloadOne = "1"
@@ -952,16 +952,16 @@ for number in sorted(specs):
         if versionOnlineTwo == "0" or dateOnlineTwo == "0" or versionOnlineTwo == "None" or dateOnlineTwo == "" or versionOnlineTwo == "None" or dateOnlineTwo == "":
             outputString.append("\n*** Check MANUALLY Version Two!!! ***")
             outputString.append("" + releaseOnlineTwo)
-            outputString.append(str(number) + " in " + str(initial[2]) + " has different Version than Online! " + str(versionInXlTwo) + " != " + str(versionOnlineTwo))
-            outputString.append(str(number) + " in " + str(initial[2]) + " has different Date than Online! " + str(dateInXlTwo) + " != " + str(dateOnlineTwo))
+            outputString.append(str(number) + " in " + str(sys.argv[2]) + " has different Version than Online! " + str(versionInXlTwo) + " != " + str(versionOnlineTwo))
+            outputString.append(str(number) + " in " + str(sys.argv[2]) + " has different Date than Online! " + str(dateInXlTwo) + " != " + str(dateOnlineTwo))
             outputString.append("***\n")
             standardsToCheck.append(number)
         else:
             outputString.append("" + releaseOnlineTwo)
-            outputString.append(str(number) + " in " + str(initial[2]) + " has different Version than Online! " + str(versionInXlTwo) + " != " + str(versionOnlineTwo))
+            outputString.append(str(number) + " in " + str(sys.argv[2]) + " has different Version than Online! " + str(versionInXlTwo) + " != " + str(versionOnlineTwo))
             if number not in standardsToCheck:
                 standardsToCheck.append(number)
-            outputString.append(str(number) + " in " + str(initial[2]) + " has different Date than Online! " + str(dateInXlTwo) + " != " + str(dateOnlineTwo) + "\n")
+            outputString.append(str(number) + " in " + str(sys.argv[2]) + " has different Date than Online! " + str(dateInXlTwo) + " != " + str(dateOnlineTwo) + "\n")
             try:
                 if specs[number].urlTwo != "None" and specs[number].urlTwo != "":
                     specs[number].downloadTwo = "1"
@@ -976,16 +976,16 @@ for number in sorted(specs):
             if versionOnlineThree == "0" or dateOnlineThree == "0" or versionOnlineThree == "None" or dateOnlineThree == "" or versionOnlineThree == "None" or dateOnlineThree == "":
                 outputString.append("\n*** Check MANUALLY Version Three!!! ***")
                 outputString.append("" + releaseOnlineThree)
-                outputString.append(str(number) + " in " + str(initial[2]) + " has different Version than Online! " + str(versionInXlThree) + " != " + str(versionOnlineThree))
-                outputString.append(str(number) + " in " + str(initial[2]) + " has different Date than Online! " + str(dateInXlThree) + " != " + str(dateOnlineThree))
+                outputString.append(str(number) + " in " + str(sys.argv[2]) + " has different Version than Online! " + str(versionInXlThree) + " != " + str(versionOnlineThree))
+                outputString.append(str(number) + " in " + str(sys.argv[2]) + " has different Date than Online! " + str(dateInXlThree) + " != " + str(dateOnlineThree))
                 outputString.append("***\n")
                 standardsToCheck.append(number)
             else:
                 outputString.append("" + releaseOnlineThree)
-                outputString.append(str(number) + " in " + str(initial[2]) + " has different Version than Online! " + str(versionInXlThree) + " != " + str(versionOnlineThree))
+                outputString.append(str(number) + " in " + str(sys.argv[2]) + " has different Version than Online! " + str(versionInXlThree) + " != " + str(versionOnlineThree))
                 if number not in standardsToCheck:
                     standardsToCheck.append(number)
-                outputString.append(str(number) + " in " + str(initial[2]) + " has different Date than Online! " + str(dateInXlThree) + " != " + str(dateOnlineThree) + "\n")
+                outputString.append(str(number) + " in " + str(sys.argv[2]) + " has different Date than Online! " + str(dateInXlThree) + " != " + str(dateOnlineThree) + "\n")
                 try:
                     if specs[number].urlThree != "None" and specs[number].urlThree != "":
                         specs[number].downloadThree = "1"

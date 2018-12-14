@@ -25,7 +25,7 @@ Infos regarding to python and the pip you'll find here: https://www.python.org/ 
 * Then run this script as follows:
 
 ```
-python specificationsHandler.py LATEST-EXCELFILE.xlsx REFERENCE-EXCELFILE.xlsx [-3]
+python specificationsHandler.py LATEST-EXCELFILE.xlsx REFERENCE-EXCELFILE.xlsx [-3] [-w]
 ```
 
 * The script checks whether there is a specification in the *LATEST-EXCELFILE.xlsx* which is not in the *REFERENCE-EXCELFILE.xlsx*. If this is the case, the complete row will saved into the *REFERENCE-EXCELFILE.xlsx*. The script also generates new columns for the version-number and the corresponding date. These columns refer to the online data.
@@ -35,6 +35,7 @@ python specificationsHandler.py LATEST-EXCELFILE.xlsx REFERENCE-EXCELFILE.xlsx [
 * If the download of the zip-file was successful, the corresponding row of the specification in the *REFERENCE-EXCELFILE.xlsx* will be updated.
 * In the last step there are a *check-txt*-file and a *log-file* generated with additionally information.
 * Use the *REFERENCE-EXCELFILE.xlsx* for following updates. The only thing you have to do is to download the *LATEST-EXCELFILE.xlsx* as described in the first step.
+* **NEW**: Since version 1.3 it is possible to extract only Word-documents from the corresponding Zip-file (without conversion to pdf), if the optional parameter *-w* is passed. You can pass both optional parameters (*-3* *-w*, the order does not matter) or just one of it.
 
 **Attention!**
 The converting into pdf might take a while, especially when you use the script the first time and many zip-files are downloaded. 

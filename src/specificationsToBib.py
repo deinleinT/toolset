@@ -20,7 +20,7 @@ def toBibDatabase(number, version, date, release, url, title, types, dbArray):
             'type': types,
             'author': "{3rd Generation Partnership Project (3GPP)}",
             'number': number,
-            'note': __convertReleaseString(release) + ", Version: " + version + ", Published: " + __convertDateString(date),
+            'note': __convertReleaseString(release) + ", version: " + version + ", published: " + __convertDateString(date),
             'url': url
         }
     print("Bib-Entry created for Specification " + str(number + "V" + version + "D" + date))

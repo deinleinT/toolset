@@ -37,6 +37,7 @@ python specificationsHandler.py LATEST-EXCELFILE.xlsx REFERENCE-EXCELFILE.xlsx [
 * Use the *REFERENCE-EXCELFILE.xlsx* for following updates. The only thing you have to do is to download the *LATEST-EXCELFILE.xlsx* as described in the first step.
 * **NEW**: Since version 1.3 it is possible to extract only Word-documents from the corresponding Zip-file (without conversion to pdf), if the optional parameter *-w* is passed. You can pass both optional parameters (*-3* *-w*, the order does not matter) or just one of it.
 * **NEW**: Since version 1.4 it is possible to pass the parameter *-wx* (instead of *-w*). By passing this parameter only Word-documents will be extracted AND all *.doc*-files will be converted into *.docx*-format.
+
 **Attention!**
 The converting into *pdf* (and *docx* as well) might take a while, especially when you use the script the first time and many zip-files are downloaded. 
 

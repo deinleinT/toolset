@@ -218,7 +218,7 @@ def extractZipFilesAndConvertToPDF(nameZip, destination, onlyWordFiles, convertD
                                 failed.add(standard)
                                 noUpdate.add(str(standard))
                             else:
-                                print("Extract: " + str(extracted) + " converted: " + str(converted) + " hence update ok, manual convert to pdf necessary --> " + newName)
+                                print("Extract: " + str(extracted) + " converted: " + str(converted) + " hence update ok, manual convert necessary --> " + newName)
 
                 else:
                     print("Did not extract " + nameZip)
@@ -264,7 +264,7 @@ def extractAndConvert():
     pdfcounter = 1
     for name in pdfs:
         standard = name.split('_')[0]
-        print("***Progress of converting all pdfs***: " + str(int(pdfcounter / len(pdfs) * 100)) + "%")
+        print("***Progress of converting all Documents***: " + str(int(pdfcounter / len(pdfs) * 100)) + "%")
         print("Specification-ID is " + str(standard) + " and name of ZIP-File is " + name)
         if standard in noUpdate or standard in failed:
             print("Skip Extracting of " + str(name) + " because is in noUpdate or failed (e.g., Excel-File has already been updated).\n")

@@ -555,7 +555,7 @@ convertDocx = False
 if "-wx" in sys.argv:
     convertDocx = True
 
-if onlyWordFiles and convertDocx:
+if "-wx" in sys.argv and "-w" in sys.argv:
     convertDocx = False
 #####################################################################################################################################################################
 

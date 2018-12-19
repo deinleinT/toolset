@@ -72,7 +72,7 @@ Despite the usage of several threads for extracting the scope of each pdf the fi
 python specificationsToBib.py REFERENCE-EXCELFILE.xlsx OUTPUT-BIBFILE [-i]
 ```
 
-##Usage of *docxExtracter.py* (since version 1.5)
+## Usage of *docxExtracter.py* (since version 1.5)
 * Same handling as *pdfExtracter.py* just for *docx*-Specifications.
 
 ```

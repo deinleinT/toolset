@@ -8,7 +8,7 @@ The scripts are written in python. Version 3.6 or more up to date is needed. The
 Several python packages are needed as well. You can use the python package index (pip) for installing the needed packages as follows:
 
 ```
-pip install pywin32 openpyxl lxml requests pypdf2 bibtexparser
+pip install pywin32 openpyxl lxml requests pypdf2 bibtexparser python-docx
 ```
 
 Infos regarding to python and the pip you'll find here: https://www.python.org/ or https://pypi.org/
@@ -37,6 +37,7 @@ python specificationsHandler.py LATEST-EXCELFILE.xlsx REFERENCE-EXCELFILE.xlsx [
 * Use the *REFERENCE-EXCELFILE.xlsx* for following updates. The only thing you have to do is to download the *LATEST-EXCELFILE.xlsx* as described in the first step.
 * **NEW**: Since version 1.3 it is possible to extract only Word-documents from the corresponding Zip-file (without conversion to pdf), if the optional parameter *-w* is passed. You can pass both optional parameters (*-3* *-w*, the order does not matter) or just one of it.
 * **NEW**: Since version 1.4 it is possible to pass the parameter *-wx* (instead of *-w*). By passing this parameter only Word-documents will be extracted AND all *.doc*-files will be converted into *.docx*-format.
+* **NEW**: Since version 1.5 the script *docxExtracter.py* is available. It allows to extract the text from the chapter *scope* of all docx-Specifications in the *Specifications*-Folder into one *txt*-file (counterpart of *pdfExtracter.py*).
 
 **Attention!**
 The converting into *pdf* (and *docx* as well) might take a while, especially when you use the script the first time and many zip-files are downloaded. 
@@ -69,6 +70,13 @@ Despite the usage of several threads for extracting the scope of each pdf the fi
 
 ```
 python specificationsToBib.py REFERENCE-EXCELFILE.xlsx OUTPUT-BIBFILE [-i]
+```
+
+##Usage of *docxExtracter.py* (since version 1.5)
+* Same handling as *pdfExtracter.py* just for *docx*-Specifications.
+
+```
+python docxExtracter.py
 ```
 
 ## Authors

@@ -4,7 +4,7 @@ Created on Apr 18, 2018
 @author: deinlein thomas
 '''
     
-import PyPDF2 
+
 import os
 import sys
 import threading

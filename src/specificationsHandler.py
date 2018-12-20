@@ -132,7 +132,7 @@ def __convert_to_docx(doc, newName):
         word.Quit()
         del word
         word = None
-        if flag:
+        if flag and (doc != newName):
             os.remove(doc)
             print("File " + str(doc) + " removed!")
         print("Was convert successful? --> " + str(flag))
@@ -181,7 +181,12 @@ def extractZipFilesAndConvertToPDF(nameZip, destination, onlyWordFiles, convertD
     standard = nameZip.split('_')[0]
     
     with zipfile.ZipFile(nameZipFile, "r") as zip_ref:
-        if len(zip_ref.namelist()) == 1:
+        docCounter = 0
+        for name in zip_ref.namelist():
+            if ".doc" in name or ".docx" in name:
+                docCounter += 1
+        
+        if docCounter == 1:
             
             for name in zip_ref.namelist():
                 if ".doc" in name or ".docx" in name:
@@ -194,7 +199,7 @@ def extractZipFilesAndConvertToPDF(nameZip, destination, onlyWordFiles, convertD
                         if ".docx" in name:
                             docname = nameZip.replace(".zip", ".docx")                        
                         
-                        zip_ref.extractall(destination)
+                        zip_ref.extract(name, destination)
                         os.rename(destination + "/" + name, destination + "/" + docname)
                         print("Extracted the file " + docname)
                         extracted = True
@@ -211,20 +216,18 @@ def extractZipFilesAndConvertToPDF(nameZip, destination, onlyWordFiles, convertD
                         if not onlyWordFiles and not convertDocx:
                             converted = __convert_to_pdf(destination + "/" + docname, newName)
                         if convertDocx:
-                            __convert_to_docx(destination + "/" + docname, newNameDocx)
+                            converted = __convert_to_docx(destination + "/" + docname, newNameDocx)
                         if not converted:
                             if not extracted:
                                 print("Extract and Convert Failed, hence add to noUpdate " + newName)
                                 failed.add(standard)
                                 noUpdate.add(str(standard))
                             else:
-                                print("Extract: " + str(extracted) + " converted: " + str(converted) + " hence update ok, manual convert necessary --> " + newName)
+                                print("Extract: " + str(extracted) + " converted: " + str(converted) + " hence update ok, manual convert might be necessary!")
 
                 else:
-                    print("Did not extract " + nameZip)
-                    failed.add(str(standard))
-                    noUpdate.add(str(standard))
-                    return
+                    print("Not a Word-Document, skip " + name)
+                    
         else:
             print("Did not extract " + nameZip + " (e.g., there is more than one file within the zip) but updated the entry in the Excel-Sheet!!!")
             return 

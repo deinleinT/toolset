@@ -4,7 +4,7 @@ Handling many 3GPP specifications could be complex and a timelasting procedure. 
 
 ### Prerequisites and Installing
 
-The scripts are written in python. Version 3.6 or more up to date is needed. The scripts were implemented under Microsoft Windows 10 and if you want using the toolset in a comprised way, you also need Microsoft Word and Excel.
+The scripts are written in python. Version 3.5 or more up to date is needed. The scripts were implemented under Microsoft Windows 10 and if you want using the toolset in a comprised way, you also need Microsoft Word and Excel.
 Several python packages are needed as well. You can use the python package index (pip) for installing the needed packages as follows:
 
 ```
@@ -78,6 +78,21 @@ python specificationsToBib.py REFERENCE-EXCELFILE.xlsx OUTPUT-BIBFILE [-i]
 ```
 python docxExtracter.py
 ```
+
+## Linux-Support since Version 2.0:
+* There are linux-versions of all four scripts within the folder *LINUX* available.
+* These scripts were tested on different hardware (all running Linux Mint 18.3).
+* Install the necessary packages first:
+
+```
+sudo apt install python3-pip
+pip3 install openpyxl lxml requests pypdf2 bibtexparser python-docx
+```
+* Run the scripts as mentioned above with the command *python3*
+
+**Important**
+The convert of *doc*-files into *docx*-file or *pdf*-files, respectively, will be done with *LibreOffice* (maybe you need to install). The converted files could have format errors. Because of that we strongly recommend using the scripts with Windows and Word.
+
 
 ## Authors
 

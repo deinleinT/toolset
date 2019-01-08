@@ -4,6 +4,8 @@ Created on Apr 18, 2018
 @author: deinlein thomas
 '''
 
+import subprocess
+import multiprocessing
 from openpyxl import load_workbook
 import sys
 import os
@@ -12,7 +14,6 @@ import requests
 import time
 import threading
 import zipfile
-from win32com import client
 from sys import exc_info
 
 
@@ -110,28 +111,19 @@ def __convert_to_docx(doc, newName):
     
     print("Convert the file " + doc + " into DOCX.")
     flag = False
-    path = os.getcwd()
     
-    docTwo = path + doc.replace(".", "", 1).replace("/", "\\")
-    newNameTwo = path + newName.replace(".", "", 1).replace("/", "\\")
+#     docTwo = doc.replace(".", "", 1).replace("/", "\\")
+#     newNameTwo = newName.replace(".", "", 1).replace("/", "\\")
     
-    print("Converting " + str(docTwo) + " to " + str(newNameTwo))
+    print("Converting " + str(doc) + " to " + str(newName))
     
     try:
-        word = client.DispatchEx("Word.Application")  
-        word.DisplayAlerts = False 
-        word.Visible = False            
-        worddoc = word.Documents.Open(docTwo)
-        worddoc.SaveAs(newNameTwo, FileFormat=12)
+        subprocess.call(['libreoffice', '--headless', '--convert-to', 'docx', '--outdir', os.getcwd() + "/Specifications", doc])
         flag = True
     except Exception as e:
         logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
         flag = False
     finally:
-        worddoc.Close(False)
-        word.Quit()
-        del word
-        word = None
         if flag and (doc != newName):
             os.remove(doc)
             print("File " + str(doc) + " removed!")
@@ -143,28 +135,19 @@ def __convert_to_pdf(doc, newName):
     
     print("Convert the file " + doc + " into PDF.")
     flag = False
-    path = os.getcwd()
     
-    docTwo = path + doc.replace(".", "", 1).replace("/", "\\")
-    newNameTwo = path + newName.replace(".", "", 1).replace("/", "\\")
+#     docTwo = doc.replace(".", "", 1).replace("/", "\\")
+#     newNameTwo = newName.replace(".", "", 1).replace("/", "\\")
     
-    print("Converting " + str(docTwo) + " to " + str(newNameTwo))
+    print("Converting " + str(doc) + " to " + str(newName))
     
     try:
-        word = client.DispatchEx("Word.Application")  
-        word.DisplayAlerts = False 
-        word.Visible = False            
-        worddoc = word.Documents.Open(docTwo)
-        worddoc.SaveAs(newNameTwo, FileFormat=17)
+        subprocess.call(['libreoffice', '--headless', '--convert-to', 'pdf', '--outdir', os.getcwd() + "/Specifications", doc])
         flag = True
     except Exception as e:
         logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
         flag = False
     finally:
-        worddoc.Close(False)
-        word.Quit()
-        del word
-        word = None
         if flag:
             os.remove(doc)
             print("File " + str(doc) + " removed!")
@@ -248,7 +231,7 @@ def getAllFilesInDirectory(pathname, ending):
 
 
 def extractAndConvert():
-    pathname = "./Specifications"
+    pathname = os.getcwd() + "/Specifications"
     if not os.path.exists(pathname):
         os.makedirs(pathname)
         
@@ -294,15 +277,15 @@ def download(srcurl, dstfilepath):
     r = requests.get(srcurl)
     result = False
 
-    if not os.path.exists("./Specifications/"):
-        os.makedirs("./Specifications/")
+    if not os.path.exists(os.getcwd() + "/Specifications/"):
+        os.makedirs(os.getcwd() + "/Specifications/")
         
-    if not os.path.exists("./Specifications/" + dstfilepath):
-        with open("./Specifications/" + dstfilepath, "wb") as code:
+    if not os.path.exists(os.getcwd() + "/Specifications/" + dstfilepath):
+        with open(os.getcwd() + "/Specifications/" + dstfilepath, "wb") as code:
             code.write(r.content)
             result = True
     
-    if os.path.exists("./Specifications/" + dstfilepath):
+    if os.path.exists(os.getcwd() + "/Specifications/" + dstfilepath):
         result = True
             
     return result
@@ -311,7 +294,7 @@ def download(srcurl, dstfilepath):
 def _getThreads():
     """ Returns the number of available threads on a posix/win based system """
     try:
-        return (int)(os.environ['NUMBER_OF_PROCESSORS'])
+        return multiprocessing.cpu_count()
     except:
         logstring.append("\n" + "Can not read number of processors... Terminate programm" + "\n")
         return -1
@@ -346,6 +329,7 @@ class fileTwo(threading.Thread):
         for row in myIter:
             specification = str(row[0].value)
             
+            status = 0
             status = int(counter / (self.__end - self.__start) * 100)
             print(str(specification) + " \t\t| " + self.__name + " \t| " + str(threading.current_thread().getName()) + " \t| Status: " + str(status) + "%")
             counter += 1
@@ -563,8 +547,8 @@ if onlyWordFiles and convertDocx:
 
 specs = dict()
 noUpdate = set()
-datumDifference = "checkSpecificationsBetween" + sys.argv[1] + "And" + sys.argv[2] + time.strftime("%d%m%Y%H%M") + "_"
-logFileName = "LogFile" + sys.argv[1] + "And" + sys.argv[2] + time.strftime("%d%m%Y%H%M") + "_"
+datumDifference = os.getcwd() + "/checkSpecificationsBetween" + sys.argv[1] + "And" + sys.argv[2] + time.strftime("%d%m%Y%H%M") + "_"
+logFileName = os.getcwd() + "/LogFile" + sys.argv[1] + "And" + sys.argv[2] + time.strftime("%d%m%Y%H%M") + "_"
 
 #############################################################################################
 threadLock = threading.Lock()
@@ -716,8 +700,8 @@ for specification in standardsInOne:
 wbTwo.save(sys.argv[2])
 wbOne.close()
 wbTwo.close()
-standardsInOne.clear()
-standardsInTwo.clear()
+standardsInOne[:] = []
+standardsInTwo[:] = []
 ##################################################
 
 wb2 = load_workbook(sys.argv[1])
@@ -906,11 +890,11 @@ wb3.close()
 print("*** Starting all Threads *** \n\n")
 startOne = 0
 startTwo = 0
-intervalTwo = round(maxSecond / numberThreads)
+intervalTwo = int(round(maxSecond / numberThreads))
 if intervalTwo == 0:
     intervalTwo = 1;
 
-thread2 = fileTwo(sys.argv[2], True, startTwo, startTwo + intervalTwo, noUpdate, specs)
+thread2 = fileTwo(os.getcwd() + "/" + sys.argv[2], True, int(startTwo), int(startTwo) + intervalTwo, noUpdate, specs)
 startTwo += intervalTwo
 
 threads.append(thread2)
@@ -919,7 +903,7 @@ while startTwo < maxSecond:
     endTwo = startTwo + intervalTwo
     if endTwo > maxSecond:
         endTwo = maxSecond
-    threads.append(fileTwo(sys.argv[2], False, startTwo, endTwo, noUpdate, specs))  
+    threads.append(fileTwo(os.getcwd() + "/" + sys.argv[2], False, startTwo, endTwo, noUpdate, specs))  
     startTwo = endTwo 
 
 for t in threads:

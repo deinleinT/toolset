@@ -80,7 +80,7 @@ python docxExtracter.py
 ```
 
 ## Linux-Support since Version 2.0:
-* There are linux-versions of all four scripts within the folder *LINUX* available.
+* There are linux-versions of all four scripts available in the folder *LINUX*.
 * These scripts were tested on different hardware (all running Linux Mint 18.3).
 * Install the necessary packages first:
 
@@ -90,8 +90,9 @@ pip3 install openpyxl lxml requests pypdf2 bibtexparser python-docx
 ```
 * Run the scripts as mentioned above with the command *python3*
 
-**Important**
-The convert of *doc*-files into *docx*-file or *pdf*-files, respectively, will be done with *LibreOffice* (maybe you need to install). The converted files could have format errors. Because of that we strongly recommend using the scripts with Windows and Word.
+**Important**:
+
+The conversion of *doc*-files into *docx*-file or *pdf*-files, respectively, will be done with *LibreOffice* (maybe you need to install LibreOffice). The converted files could have format errors. Because of that we strongly recommend using the scripts with Windows.
 
 
 ## Authors

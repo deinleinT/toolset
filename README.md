@@ -86,6 +86,7 @@ python docxExtracter.py
 
 ```
 sudo apt install python3-pip
+sudo apt install python3-setuptools
 pip3 install openpyxl lxml requests pypdf2 bibtexparser python-docx
 ```
 * Run the scripts as mentioned above with the command *python3*

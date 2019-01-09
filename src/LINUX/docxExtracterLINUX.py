@@ -3,7 +3,6 @@ Created on Apr 18, 2018
 
 @author: deinlein thomas
 '''
-    
 
 import os
 import sys
@@ -24,7 +23,7 @@ class MyThread(threading.Thread):
         print("Starting Thread " + str(threading.current_thread().getName()) + " Number of Docxs: " + str(len(self.__docxList)))
         counterProgress = 0
         for s in self.__docxList: 
-            progress = (int) (counterProgress / len(self.__docxList) * 100)
+            progress = (int) (counterProgress * 100.0 / len(self.__docxList))
             print("Processing Specification " + str(s) + " in Thread " + str(threading.current_thread().getName()) + ", Thread progress: " + str(progress) + "% ...\n")
             text = ""
             doc = docx.Document(s)
@@ -113,7 +112,7 @@ if intervalTwo <= 0:
     intervalTwo = 1;
 
 # the first thread of each excel must pass True in constructor
-threadOne = MyThread(pdfs[startTwo:intervalTwo], wholeText)
+threadOne = MyThread(pdfs[(int)(startTwo):(int)(intervalTwo)], wholeText)
 startTwo += intervalTwo
 
 # append all to array
@@ -123,7 +122,7 @@ while startTwo < len(pdfs):
     endTwo = startTwo + intervalTwo + 1
     if endTwo > len(pdfs):
         endTwo = len(pdfs)
-    threads.append(MyThread(pdfs[startTwo:endTwo], wholeText))  
+    threads.append(MyThread(pdfs[(int)(startTwo):(int)(endTwo)], wholeText))  
     startTwo = endTwo 
 
 # join

@@ -25,7 +25,7 @@ Infos regarding to python and the pip you'll find here: https://www.python.org/ 
 * Then run this script as follows:
 
 ```
-python specificationsHandler.py LATEST-EXCELFILE.xlsx REFERENCE-EXCELFILE.xlsx [-3] [-w | -wx]
+python specificationsHandler.py LATEST-EXCELFILE.xlsx REFERENCE-EXCELFILE.xlsx [ -3 ] [ -w | -wx | -wxp ]
 ```
 
 * The script checks whether there is a specification in the *LATEST-EXCELFILE.xlsx* which is not in the *REFERENCE-EXCELFILE.xlsx*. If this is the case, the complete row will saved into the *REFERENCE-EXCELFILE.xlsx*. The script also generates new columns for the version-number and the corresponding date. These columns refer to the online data.
@@ -37,7 +37,8 @@ python specificationsHandler.py LATEST-EXCELFILE.xlsx REFERENCE-EXCELFILE.xlsx [
 * Use the *REFERENCE-EXCELFILE.xlsx* for following updates. The only thing you have to do is to download the *LATEST-EXCELFILE.xlsx* as described in the first step.
 * **NEW**: Since version 1.3 it is possible to extract only Word-documents from the corresponding Zip-file (without conversion to pdf), if the optional parameter *-w* is passed. You can pass both optional parameters (*-3* *-w*, the order does not matter) or just one of it.
 * **NEW**: Since version 1.4 it is possible to pass the parameter *-wx* (instead of *-w*). By passing this parameter only Word-documents will be extracted AND all *.doc*-files will be converted into *.docx*-format.
-* **NEW**: Since version 1.5 the script *docxExtracter.py* is available. It allows to extract the text from the chapter *scope* of all docx-Specifications in the *Specifications*-Folder into one *txt*-file (counterpart of *pdfExtracter.py*).
+* **NEW**: Since version 1.5 the script *docxExtracter.py* is available. It allows to extract the text from the chapter *scope* of all docx-Specifications in the *Specifications*-Folder into one *txt*-file (counterpart of *pdfExtracter.py*). Furthermore, it is possible to extract the comprehensive text of all docx-files within the *Specifications*-Folder by passing the optional parameter *-a* (windows only).
+* **NEW**: Since version 2.1 it is possible to generate both pdf and docx files of downloaded specifications by passing the optional parameter *-wxp* (windows only).
 
 **Attention!**
 The converting into *pdf* (and *docx* as well) might take a while, especially when you use the script the first time and many zip-files are downloaded. 
@@ -47,7 +48,7 @@ Within the REFERENCE-EXCELFILE.xlsx there will be columns generated with name *V
 Choose the tab *Versions*. The versions are sorted by the release. In this case the columns *Version* and *Date* correspond to the release at the top and the latest published version, *VersionTwo* and *DateTwo* always correspond to the release which comes next to the first release. 
 Regarding to 36.300 the latest version (and date) of release 15 and release 14 would be checked and compared to the values which are saved in the REFERENCE-EXCELFILE.xlsx. If there are newer versions available, it would be downloaded and the referring field in the column would be updated. It is also possible to check whether there is a third published release of a specification by passing the optional parameter *-3*.
 
-## Usage of *pdfExtracter.py*
+## Usage of *pdfExtracter.py* / *docxExtracter.py*
 * Be sure, there is a folder with name *Specifications* in the same directory as this script. 
 * All PDF-Files in the *Specifications*-Folder will be searched through and the individual scope-section will be read.
 * This script uses several threads to shorten the procedure.
@@ -57,6 +58,7 @@ Regarding to 36.300 the latest version (and date) of release 15 and release 14 w
 
 ```
 python pdfExtracter.py
+python docxExtracter.py [ -a ]
 ```
 
 **Important remark:**
@@ -69,7 +71,7 @@ Despite the usage of several threads for extracting the scope of each pdf the fi
 * Because a specific specification can have several release versions, the version-number and the corresponding date is saved into the *note*-field.
 
 ```
-python specificationsToBib.py REFERENCE-EXCELFILE.xlsx OUTPUT-BIBFILE [-i]
+python specificationsToBib.py REFERENCE-EXCELFILE.xlsx OUTPUT-BIBFILE [ -i ]
 ```
 
 ## Usage of *docxExtracter.py* (since version 1.5)

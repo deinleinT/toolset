@@ -139,7 +139,7 @@ def __convert_to_docx(doc, newName):
         return flag
 
 
-def __convert_to_pdf(doc, newName):
+def __convert_to_pdf(doc, newName, delFlag):
     
     print("Convert the file " + doc + " into PDF.")
     flag = False
@@ -165,14 +165,14 @@ def __convert_to_pdf(doc, newName):
         word.Quit()
         del word
         word = None
-        if flag:
+        if flag and delFlag:
             os.remove(doc)
             print("File " + str(doc) + " removed!")
         print("Was convert successful? --> " + str(flag))
         return flag
     
 
-def extractZipFilesAndConvertToPDF(nameZip, destination, onlyWordFiles, convertDocx):
+def extractZipFilesAndConvertToPDF(nameZip, destination, onlyWordFiles, convertDocx, convertDocxAndPDF):
     
     nameZipFile = destination + "/" + nameZip
     converted = False
@@ -213,10 +213,15 @@ def extractZipFilesAndConvertToPDF(nameZip, destination, onlyWordFiles, convertD
                         noUpdate.add(str(standard))
                     
                     if os.path.isfile(destination + "/" + docname):
-                        if not onlyWordFiles and not convertDocx:
-                            converted = __convert_to_pdf(destination + "/" + docname, newName)
+                        if not onlyWordFiles and not convertDocx and not convertDocxAndPDF:
+                            converted = __convert_to_pdf(destination + "/" + docname, newName, True)
                         if convertDocx:
                             converted = __convert_to_docx(destination + "/" + docname, newNameDocx)
+                        if convertDocxAndPDF:
+                            tempConverted = __convert_to_pdf(destination + "/" + docname, newName, False)
+                            converted = __convert_to_docx(destination + "/" + docname, newNameDocx)
+                            if not converted:
+                                converted = tempConverted
                         if not converted:
                             if not extracted:
                                 print("Extract and Convert Failed, hence add to noUpdate " + newName)
@@ -274,7 +279,7 @@ def extractAndConvert():
             continue
         try:
             print("Try to extract " + name)
-            extractZipFilesAndConvertToPDF(name, pathname, onlyWordFiles, convertDocx)
+            extractZipFilesAndConvertToPDF(name, pathname, onlyWordFiles, convertDocx, convertDocxAndPDF)
             print("Unzipping of " + name + " finished!\n")
         except Exception as e:
             logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
@@ -556,9 +561,17 @@ if "-w" in sys.argv:
 convertDocx = False
 if "-wx" in sys.argv:
     convertDocx = True
-
-if onlyWordFiles and convertDocx:
+    
+###
+convertDocxAndPDF = False
+if "-wxp" in sys.argv:
+    convertDocxAndPDF = True
     convertDocx = False
+###
+
+if onlyWordFiles:
+    convertDocx = False
+    convertDocxAndPDF = False
 #####################################################################################################################################################################
 
 specs = dict()

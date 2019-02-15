@@ -139,7 +139,7 @@ print("\n*******Threads finished!*********\n")
 # write into textfile
 print("Write the file...\n")
 if textFileName != "":
-    out = open(textFileName + ".txt", "w")
+    out = open(textFileName + ".txt", "w", encoding="utf-8")
 else:
     out = open("allScopes.txt", "w")
 out.write("\n\n")

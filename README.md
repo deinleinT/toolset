@@ -25,7 +25,7 @@ Infos regarding to python and the pip you'll find here: https://www.python.org/ 
 * Then run this script as follows:
 
 ```
-python specificationsHandler.py LATEST-EXCELFILE.xlsx REFERENCE-EXCELFILE.xlsx [ -3 ] [ -w | -wx | -wxp ]
+python specificationsHandler.py LATEST-EXCELFILE.xlsx REFERENCE-EXCELFILE.xlsx [ -3 ] [ -w | -wx | -wxp ] [ -cl ]
 ```
 
 * The script checks whether there is a specification in the *LATEST-EXCELFILE.xlsx* which is not in the *REFERENCE-EXCELFILE.xlsx*. If this is the case, the complete row will saved into the *REFERENCE-EXCELFILE.xlsx*. The script also generates new columns for the version-number and the corresponding date. These columns refer to the online data.
@@ -39,6 +39,7 @@ python specificationsHandler.py LATEST-EXCELFILE.xlsx REFERENCE-EXCELFILE.xlsx [
 * **NEW**: Since version 1.4 it is possible to pass the parameter *-wx* (instead of *-w*). By passing this parameter only Word-documents will be extracted AND all *.doc*-files will be converted into *.docx*-format.
 * **NEW**: Since version 1.5 the script *docxExtracter.py* is available. It allows to extract the text from the chapter *scope* of all docx-Specifications in the *Specifications*-Folder into one *txt*-file (counterpart of *pdfExtracter.py*). Furthermore, it is possible to extract the comprehensive text of all docx-files within the *Specifications*-Folder by passing the optional parameter *-a* (windows only).
 * **NEW**: Since version 2.1 it is possible to generate both pdf and docx files of downloaded specifications by passing the optional parameter *-wxp* (windows only).
+* **NEW**: Since version 2.2 the optional parameter *-cl* is introduced. By using, it is possible to extract and convert a specification even though there are more than one *doc* or *docx*-files within the zip-file. The doc(x)-file with a *cl* substring in its name will be chosen (the first that was found in the zipfile) and extracted and converted (an example-file would be specification 21.866 Version 1.2.1).
 
 **Attention!**
 The converting into *pdf* (and *docx* as well) might take a while, especially when you use the script the first time and many zip-files are downloaded. 
@@ -55,6 +56,7 @@ Regarding to 36.300 the latest version (and date) of release 15 and release 14 w
 * After all threads are finished a textfile with name *scopeOfSpecifications.txt* is generated.
 * In this txt-document are all scope-sections of all captured specificationdocuments saved.
 * Now it is possible to do a keywordsearch within this txt-file. 
+* **NEW**: Since version 1.5 the script *docxExtracter.py* is available. It allows to extract the text from the chapter *scope* of all docx-Specifications in the *Specifications*-Folder into one *txt*-file (counterpart of *pdfExtracter.py*). Furthermore, it is possible to extract the comprehensive text of all docx-files within the *Specifications*-Folder by passing the optional parameter *-a* (windows only).
 
 ```
 python pdfExtracter.py

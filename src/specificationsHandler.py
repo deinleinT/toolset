@@ -182,14 +182,23 @@ def extractZipFilesAndConvertToPDF(nameZip, destination, onlyWordFiles, convertD
     
     with zipfile.ZipFile(nameZipFile, "r") as zip_ref:
         docCounter = 0
+        clCheck = False
         for name in zip_ref.namelist():
             if ".doc" in name or ".docx" in name:
                 docCounter += 1
         
+        if docCounter > 1:
+            if cl:
+                docCounter = 1
+                clCheck = True
+        
         if docCounter == 1:
-            
             for name in zip_ref.namelist():
                 if ".doc" in name or ".docx" in name:
+                    if clCheck:
+                        if name.find("cl") == -1:
+                            continue 
+                   
                     docname = name
                     extracted = False
                     
@@ -229,7 +238,10 @@ def extractZipFilesAndConvertToPDF(nameZip, destination, onlyWordFiles, convertD
                                 noUpdate.add(str(standard))
                             else:
                                 print("Extract: " + str(extracted) + " converted: " + str(converted) + " hence update ok, manual convert might be necessary!")
-
+                    
+                    if clCheck:
+                        if name.find("cl") != -1:
+                            break
                 else:
                     print("Not a Word-Document, skip " + name)
                     
@@ -561,13 +573,18 @@ if "-w" in sys.argv:
 convertDocx = False
 if "-wx" in sys.argv:
     convertDocx = True
+####################################################################################################################################################################
+cl = False
+if "-cl" in sys.argv:
+    cl = True
+####################################################################################################################################################################
     
-###
+# ##
 convertDocxAndPDF = False
 if "-wxp" in sys.argv:
     convertDocxAndPDF = True
     convertDocx = False
-###
+# ##
 
 if onlyWordFiles:
     convertDocx = False
@@ -777,7 +794,7 @@ for row in myIter:
     specification = str(row[0].value)
     if str(row[0].value) == "None":
         continue
-    
+     
     try:
         if str(row[1].value) == "None" or str(row[1].value) == "":
             row[1].value = specs[specification].stype
@@ -847,69 +864,14 @@ for row in myIter:
     except Exception as e:
         logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
         ws.cell(row=currentRow, column=11).value = ""
-            
-    try:
-        if str(row[11].value) == "None" or str(row[11].value) == "":
-            row[11].value = "0"
-    except Exception as e:
-        logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
-        ws.cell(row=currentRow, column=12).value = "0"
-        
-    try:
-        if str(row[12].value) == "None" or str(row[12].value) == "":
-            row[12].value = "0"
-    except Exception as e:
-        logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
-        ws.cell(row=currentRow, column=13).value = "0"
-    
-    try:
-        if str(row[13].value) == "None" or str(row[13].value) == "":
-            row[13].value = "0"
-    except Exception as e:
-        logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
-        ws.cell(row=currentRow, column=14).value = "0"
-    
-    try:
-        if str(row[14].value) == "None" or str(row[14].value) == "":
-            row[14].value = "0"
-    except Exception as e:
-        logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
-        ws.cell(row=currentRow, column=15).value = "0"
-        
-    try:
-        if str(row[15].value) == "None" or str(row[15].value) == "":
-            row[15].value = "0"
-    except Exception as e:
-        logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
-        ws.cell(row=currentRow, column=16).value = "0"
-    
-    try:
-        if str(row[16].value) == "None" or str(row[16].value) == "":
-            row[16].value = "0"
-    except Exception as e:
-        logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
-        ws.cell(row=currentRow, column=17).value = "0"
-    
-    try:
-        if str(row[17].value) == "None" or str(row[17].value) == "":
-            row[17].value = "0"
-    except Exception as e:
-        logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
-        ws.cell(row=currentRow, column=18).value = "0"
-    
-    try:
-        if str(row[18].value) == "None" or str(row[18].value) == "":
-            row[18].value = "0"
-    except Exception as e:
-        logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
-        ws.cell(row=currentRow, column=19).value = "0"
-    
-    try:
-        if str(row[19].value) == "None" or str(row[19].value) == "":
-            row[19].value = "0"
-    except Exception as e:
-        logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
-        ws.cell(row=currentRow, column=20).value = "0"
+                   
+    for i in range(11, 20):
+        try:
+            if str(row[i].value) == "None" or str(row[i].value) == "":
+                row[i].value = "0"
+        except Exception as e:
+            logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
+            ws.cell(row=currentRow, column=(i + 1)).value = "0"
 
 wb3.save(sys.argv[2])
 wb3.close()

@@ -16,8 +16,10 @@ from win32com import client
 from sys import exc_info
 
 
+######################################################################################################################################################################################
+################################################class definition SpecInfo######################################################################
+###################################################################################################################################################################################
 class SpecInfo():
-
     def __init__(self, spec, stype, title, status, primaryRespGrp, primaryRapporteur, initialPlannedRelease, publication, commonIMS, technology, important, versionOnlineOne, versionOnlineTwo, versionInXl, dateOnlineOne, dateOnlineTwo, dateInXl, urlOne, urlTwo, hyperlink, downloadOne, downloadTwo, notInOne, releaseOnlineOne, releaseOnlineTwo, versionInXlTwo, dateInXlTwo, versionOnlineThree, versionInXlThree, downloadThree, dateOnlineThree, dateInXlThree, urlThree, releaseOnlineThree, releaseInXLOne, releaseInXLTwo, releaseInXLThree):
         self.spec = spec
         self.title = title
@@ -56,285 +58,12 @@ class SpecInfo():
         self.releaseInXLOne = releaseOnlineOne
         self.releaseInXLTwo = releaseInXLTwo
         self.releaseInXLThree = releaseInXLThree
+############################################################################################################################################################################
 
-
-def currentUpdate(standardNumber, kind):
-    
-    print("Updating-Process of Specification-ID " + str(standardNumber) + " started...") 
-    wb2 = load_workbook(sys.argv[2])
-    sheetnames = wb2.sheetnames
-    ws = wb2[sheetnames[0]]
-    myIter = ws.iter_rows(row_offset=1)
-    
-    # Iterate over the rows in the Excel-sheet but skip the header.
-    for row in myIter:
-        number = row[0].value
-        
-        if str(number) == "None":
-            continue
-        if str(standardNumber) == str(number):
-            if str(number) in failed:
-                print("Do not update " + str(number) + " because extract failed!\n")
-                continue
-            if str(number) in str(noUpdate):
-                print("Do not update " + str(number) + " because in noUpdate!\n")  
-                continue  
-            print("Updating the entry in the Excel-File of Specification-ID " + str(number))            
-            if kind == "one":
-                print("Update Version ONE")
-                row[11].value = specs[str(number)].versionOnlineOne
-                row[12].value = specs[str(number)].dateOnlineOne
-                row[17].value = specs[str(number)].releaseOnlineOne
-            elif kind == "two":
-                print("Update Version TWO")
-                row[13].value = specs[str(number)].versionOnlineTwo
-                row[14].value = specs[str(number)].dateOnlineTwo
-                row[18].value = specs[str(number)].releaseOnlineTwo
-            elif kind == "three":
-                print("Update Version THREE")
-                row[15].value = specs[str(number)].versionOnlineThree
-                row[16].value = specs[str(number)].dateOnlineThree
-                row[19].value = specs[str(number)].releaseOnlineThree
-        
-    wb2.save(sys.argv[2])
-    wb2.close()
-    print("Updating-Process of Specification-ID " + str(standardNumber) + " finished!\n")
-
-
-def getValues(folder):
-    values = folder.split('_')[1]
-    return values
-
-
-def __convert_to_docx(doc, newName):
-    
-    print("Convert the file " + doc + " into DOCX.")
-    flag = False
-    path = os.getcwd()
-    
-    docTwo = path + doc.replace(".", "", 1).replace("/", "\\")
-    newNameTwo = path + newName.replace(".", "", 1).replace("/", "\\")
-    
-    print("Converting " + str(docTwo) + " to " + str(newNameTwo))
-    
-    try:
-        word = client.DispatchEx("Word.Application")  
-        word.DisplayAlerts = False 
-        word.Visible = False            
-        worddoc = word.Documents.Open(docTwo)
-        worddoc.SaveAs(newNameTwo, FileFormat=12)
-        flag = True
-    except Exception as e:
-        logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
-        flag = False
-    finally:
-        worddoc.Close(False)
-        word.Quit()
-        del word
-        word = None
-        if flag and (doc != newName):
-            os.remove(doc)
-            print("File " + str(doc) + " removed!")
-        print("Was convert successful? --> " + str(flag))
-        return flag
-
-
-def __convert_to_pdf(doc, newName, delFlag):
-    
-    print("Convert the file " + doc + " into PDF.")
-    flag = False
-    path = os.getcwd()
-    
-    docTwo = path + doc.replace(".", "", 1).replace("/", "\\")
-    newNameTwo = path + newName.replace(".", "", 1).replace("/", "\\")
-    
-    print("Converting " + str(docTwo) + " to " + str(newNameTwo))
-    
-    try:
-        word = client.DispatchEx("Word.Application")  
-        word.DisplayAlerts = False 
-        word.Visible = False            
-        worddoc = word.Documents.Open(docTwo)
-        worddoc.SaveAs(newNameTwo, FileFormat=17)
-        flag = True
-    except Exception as e:
-        logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
-        flag = False
-    finally:
-        worddoc.Close(False)
-        word.Quit()
-        del word
-        word = None
-        if flag and delFlag:
-            os.remove(doc)
-            print("File " + str(doc) + " removed!")
-        print("Was convert successful? --> " + str(flag))
-        return flag
-    
-
-def extractZipFilesAndConvertToPDF(nameZip, destination, onlyWordFiles, convertDocx, convertDocxAndPDF):
-    
-    nameZipFile = destination + "/" + nameZip
-    converted = False
-    newName = nameZipFile.replace(".zip", ".pdf")
-    newNameDocx = nameZipFile.replace(".zip", ".docx")
-    standard = nameZip.split('_')[0]
-    
-    with zipfile.ZipFile(nameZipFile, "r") as zip_ref:
-        docCounter = 0
-        clCheck = False
-        for name in zip_ref.namelist():
-            if ".doc" in name or ".docx" in name:
-                docCounter += 1
-        
-        if docCounter > 1:
-            if cl:
-                docCounter = 1
-                clCheck = True
-        
-        if docCounter == 1:
-            for name in zip_ref.namelist():
-                if ".doc" in name or ".docx" in name:
-                    if clCheck:
-                        if name.find("cl") == -1:
-                            continue 
-                   
-                    docname = name
-                    extracted = False
-                    
-                    try:
-                        if ".doc"in name:
-                            docname = nameZip.replace(".zip", ".doc")
-                        if ".docx" in name:
-                            docname = nameZip.replace(".zip", ".docx")                        
-                        
-                        zip_ref.extract(name, destination)
-                        os.rename(destination + "/" + name, destination + "/" + docname)
-                        print("Extracted the file " + docname)
-                        extracted = True
-                    except Exception as e:
-                        logstring.append("ERROR in extractZipFilesMethod " + name + " ... NO Extract!!! " + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
-                    
-                    print("Extraction successful? --> " + str(extracted))
-                    if not extracted:
-                        print("extracted Failed, hence add to noUpdate " + str(extracted))
-                        failed.add(standard)
-                        noUpdate.add(str(standard))
-                    
-                    if os.path.isfile(destination + "/" + docname):
-                        if not onlyWordFiles and not convertDocx and not convertDocxAndPDF:
-                            converted = __convert_to_pdf(destination + "/" + docname, newName, True)
-                        if convertDocx:
-                            converted = __convert_to_docx(destination + "/" + docname, newNameDocx)
-                        if convertDocxAndPDF:
-                            tempConverted = __convert_to_pdf(destination + "/" + docname, newName, False)
-                            converted = __convert_to_docx(destination + "/" + docname, newNameDocx)
-                            if not converted:
-                                converted = tempConverted
-                        if not converted:
-                            if not extracted:
-                                print("Extract and Convert Failed, hence add to noUpdate " + newName)
-                                failed.add(standard)
-                                noUpdate.add(str(standard))
-                            else:
-                                print("Extract: " + str(extracted) + " converted: " + str(converted) + " hence update ok, manual convert might be necessary!")
-                    
-                    if clCheck:
-                        if name.find("cl") != -1:
-                            break
-                else:
-                    print("Not a Word-Document, skip " + name)
-                    
-        else:
-            print("Did not extract " + nameZip + " (e.g., there is more than one file within the zip) but updated the entry in the Excel-Sheet!!!")
-            return 
-    if os.path.isfile(nameZipFile) and (converted or extracted):
-        os.remove(nameZipFile) 
-        print("Zip-File " + nameZipFile + " removed!")   
-        return
-
-
-def getAllFilesInDirectory(pathname, ending):
-    dirList = os.listdir(pathname)
-    dirList.sort()
-    pdfs = []
-    for g in dirList:
-        if g.endswith(ending):
-            pdfs.append(g)
-    return pdfs
-
-
-def extractAndConvert():
-    pathname = "./Specifications"
-    if not os.path.exists(pathname):
-        os.makedirs(pathname)
-        
-    pdfs = []
-    
-    try:
-        pdfs = getAllFilesInDirectory(pathname, ".zip")
-    except Exception as e:
-        logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
-    
-    if len(pdfs) == 0:
-        failed.clear()
-        failed.add("-1")
-        return 
-    
-    pdfcounter = 1
-    for name in pdfs:
-        standard = name.split('_')[0]
-        print("***Progress of converting all Documents***: " + str(int(pdfcounter / len(pdfs) * 100)) + "%")
-        print("Specification-ID is " + str(standard) + " and name of ZIP-File is " + name)
-        if standard in noUpdate or standard in failed:
-            print("Skip Extracting of " + str(name) + " because is in noUpdate or failed (e.g., Excel-File has already been updated).\n")
-            continue
-        try:
-            print("Try to extract " + name)
-            extractZipFilesAndConvertToPDF(name, pathname, onlyWordFiles, convertDocx, convertDocxAndPDF)
-            print("Unzipping of " + name + " finished!\n")
-        except Exception as e:
-            logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
-        
-        if str(specs[standard].downloadOne) == "1" and str(specs[standard].releaseOnlineOne) in name:
-            currentUpdate(standard, "one")
-        elif str(specs[standard].downloadTwo) == "1" and str(specs[standard].releaseOnlineTwo) in name:
-            currentUpdate(standard, "two")
-        elif str(specs[standard].downloadThree) == "1" and str(specs[standard].releaseOnlineThree) in name:
-            currentUpdate(standard, "three")
-        pdfcounter += 1           
-    return 
-
-    
-def download(srcurl, dstfilepath):
- 
-    r = requests.get(srcurl)
-    result = False
-
-    if not os.path.exists("./Specifications/"):
-        os.makedirs("./Specifications/")
-        
-    if not os.path.exists("./Specifications/" + dstfilepath):
-        with open("./Specifications/" + dstfilepath, "wb") as code:
-            code.write(r.content)
-            result = True
-    
-    if os.path.exists("./Specifications/" + dstfilepath):
-        result = True
-            
-    return result
-
-
-def _getThreads():
-    """ Returns the number of available threads on a posix/win based system """
-    try:
-        return (int)(os.environ['NUMBER_OF_PROCESSORS'])
-    except:
-        logstring.append("\n" + "Can not read number of processors... Terminate programm" + "\n")
-        return -1
-    
-    
-class fileTwo(threading.Thread):
+##############################################################################################################################################################################
+#######################################Class definition Thread for retrieving online information of each spec
+#############################################################################################################################################################################
+class InquirerThread(threading.Thread):
 
     def __init__(self, name, check, start, end, noUpdate, specs):
         threading.Thread.__init__(self)
@@ -501,8 +230,11 @@ class fileTwo(threading.Thread):
         print("\n\n\n")
         print("Processing of " + str(threading.current_thread().getName()) + " is finished!\n\n\n") 
         wb2.close()
+#############################################################################################################################################################################################
 
-
+###############################################################################################################################################################################################
+###########################################Class Definition DownloadZIPs 
+###############################################################################################################################################################################################
 class DownloadZIPs(threading.Thread):
 
     def __init__(self, specs, noUpdate, failed, kind):
@@ -555,12 +287,305 @@ class DownloadZIPs(threading.Thread):
                 except Exception as e:
                     self.__failed.add(str(key)) 
                     logstring.append("\n" + str(e) + " " + "Download file " + directory + " FAILED!\n" + "ERROR in downloadZIpsRUN" + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
+############################################################################################################################################################################################################
+############################################################################################################################################################################################################
+############################################################################################################################################################################################################
+
+def currentUpdate(standardNumber, kind):
+    """
+    updates the spec in the ExcelSheet after extracting and converting
+    """
+    print("Updating-Process of Specification-ID " + str(standardNumber) + " started...") 
+    wb2 = load_workbook(nameSecondExcelSheet)
+    sheetnames = wb2.sheetnames
+    ws = wb2[sheetnames[0]]
+    myIter = ws.iter_rows(row_offset=1)
+    
+    # Iterate over the rows in the Excel-sheet but skip the header.
+    for row in myIter:
+        number = row[0].value
+        
+        if str(number) == "None":
+            continue
+        if str(standardNumber) == str(number):
+            if str(number) in failed:
+                print("Do not update " + str(number) + " because extract failed!\n")
+                continue
+            if str(number) in str(noUpdate):
+                print("Do not update " + str(number) + " because in noUpdate!\n")  
+                continue  
+            print("Updating the entry in the Excel-File of Specification-ID " + str(number))            
+            if kind == "one":
+                print("Update Version ONE")
+                row[11].value = specs[str(number)].versionOnlineOne
+                row[12].value = specs[str(number)].dateOnlineOne
+                row[17].value = specs[str(number)].releaseOnlineOne
+            elif kind == "two":
+                print("Update Version TWO")
+                row[13].value = specs[str(number)].versionOnlineTwo
+                row[14].value = specs[str(number)].dateOnlineTwo
+                row[18].value = specs[str(number)].releaseOnlineTwo
+            elif kind == "three":
+                print("Update Version THREE")
+                row[15].value = specs[str(number)].versionOnlineThree
+                row[16].value = specs[str(number)].dateOnlineThree
+                row[19].value = specs[str(number)].releaseOnlineThree
+        
+    wb2.save(nameSecondExcelSheet)
+    wb2.close()
+    print("Updating-Process of Specification-ID " + str(standardNumber) + " finished!\n")
+
+def getValues(folder):
+    """
+    returns an array with the words splitted by _
+    """
+    values = folder.split('_')[1]
+    return values
+
+def __convert_to_docx(doc, newName):
+    """
+    converts the doc-file to docx
+    """    
+    print("Convert the file " + doc + " into DOCX.")
+    flag = False
+    path = os.getcwd()
+    
+    docTwo = path + doc.replace(".", "", 1).replace("/", "\\")
+    newNameTwo = path + newName.replace(".", "", 1).replace("/", "\\")
+    
+    print("Converting " + str(docTwo) + " to " + str(newNameTwo))
+    
+    try:
+        word = client.DispatchEx("Word.Application")  
+        word.DisplayAlerts = False 
+        word.Visible = False            
+        worddoc = word.Documents.Open(docTwo)
+        worddoc.SaveAs(newNameTwo, FileFormat=12)
+        flag = True
+    except Exception as e:
+        logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
+        flag = False
+    finally:
+        worddoc.Close(False)
+        word.Quit()
+        del word
+        word = None
+        if flag and (doc != newName):
+            os.remove(doc)
+            print("File " + str(doc) + " removed!")
+        print("Was convert successful? --> " + str(flag))
+        return flag
 
 
-#############################################################################################
-#################Programm Start##############################################################
+def __convert_to_pdf(doc, newName, delFlag):
+    """
+    converts the doc or docx-file to pdf
+    """
+    print("Convert the file " + doc + " into PDF.")
+    flag = False
+    path = os.getcwd()
+    
+    docTwo = path + doc.replace(".", "", 1).replace("/", "\\")
+    newNameTwo = path + newName.replace(".", "", 1).replace("/", "\\")
+    
+    print("Converting " + str(docTwo) + " to " + str(newNameTwo))
+    
+    try:
+        word = client.DispatchEx("Word.Application")  
+        word.DisplayAlerts = False 
+        word.Visible = False            
+        worddoc = word.Documents.Open(docTwo)
+        worddoc.SaveAs(newNameTwo, FileFormat=17)
+        flag = True
+    except Exception as e:
+        logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
+        flag = False
+    finally:
+        worddoc.Close(False)
+        word.Quit()
+        del word
+        word = None
+        if flag and delFlag:
+            os.remove(doc)
+            print("File " + str(doc) + " removed!")
+        print("Was convert successful? --> " + str(flag))
+        return flag
+    
+
+def extractZipFilesAndConvertToPDF(nameZip, destination, onlyWordFiles, convertDocx, convertDocxAndPDF):
+    """
+    extract zipfile and convert to pdf
+    """
+    nameZipFile = destination + "/" + nameZip
+    converted = False
+    newName = nameZipFile.replace(".zip", ".pdf")
+    newNameDocx = nameZipFile.replace(".zip", ".docx")
+    standard = nameZip.split('_')[0]
+    
+    with zipfile.ZipFile(nameZipFile, "r") as zip_ref:
+        docCounter = 0
+        clCheck = False
+        for name in zip_ref.namelist():
+            if ".doc" in name or ".docx" in name:
+                docCounter += 1
+        
+        if docCounter > 1:
+            if cl:
+                docCounter = 1
+                clCheck = True
+        
+        if docCounter == 1:
+            for name in zip_ref.namelist():
+                if ".doc" in name or ".docx" in name:
+                    if clCheck:
+                        if name.find("cl") == -1:
+                            continue 
+                   
+                    docname = name
+                    extracted = False
+                    
+                    try:
+                        if ".doc"in name:
+                            docname = nameZip.replace(".zip", ".doc")
+                        if ".docx" in name:
+                            docname = nameZip.replace(".zip", ".docx")                        
+                        
+                        zip_ref.extract(name, destination)
+                        os.rename(destination + "/" + name, destination + "/" + docname)
+                        print("Extracted the file " + docname)
+                        extracted = True
+                    except Exception as e:
+                        logstring.append("ERROR in extractZipFilesMethod " + name + " ... NO Extract!!! " + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
+                    
+                    print("Extraction successful? --> " + str(extracted))
+                    if not extracted:
+                        print("extracted Failed, hence add to noUpdate " + str(extracted))
+                        failed.add(standard)
+                        noUpdate.add(str(standard))
+                    
+                    if os.path.isfile(destination + "/" + docname):
+                        if not onlyWordFiles and not convertDocx and not convertDocxAndPDF:
+                            converted = __convert_to_pdf(destination + "/" + docname, newName, True)
+                        if convertDocx:
+                            converted = __convert_to_docx(destination + "/" + docname, newNameDocx)
+                        if convertDocxAndPDF:
+                            tempConverted = __convert_to_pdf(destination + "/" + docname, newName, False)
+                            converted = __convert_to_docx(destination + "/" + docname, newNameDocx)
+                            if not converted:
+                                converted = tempConverted
+                        if not converted:
+                            if not extracted:
+                                print("Extract and Convert Failed, hence add to noUpdate " + newName)
+                                failed.add(standard)
+                                noUpdate.add(str(standard))
+                            else:
+                                print("Extract: " + str(extracted) + " converted: " + str(converted) + " hence update ok, manual convert might be necessary!")
+                    
+                    if clCheck:
+                        if name.find("cl") != -1:
+                            break
+                else:
+                    print("Not a Word-Document, skip " + name)
+                    
+        else:
+            print("Did not extract " + nameZip + " (e.g., there is more than one file within the zip) but updated the entry in the Excel-Sheet!!!")
+            return 
+    if os.path.isfile(nameZipFile) and (converted or extracted):
+        os.remove(nameZipFile) 
+        print("Zip-File " + nameZipFile + " removed!")   
+        return
+
+
+def getAllFilesInDirectory(pathname, ending):
+    """
+    returns an array with all specific filenames within a folder
+    """
+    dirList = os.listdir(pathname)
+    dirList.sort()
+    pdfs = []
+    for g in dirList:
+        if g.endswith(ending):
+            pdfs.append(g)
+    return pdfs
+
+
+def extractAndConvert():
+    pathname = "./Specifications"
+    if not os.path.exists(pathname):
+        os.makedirs(pathname)
+        
+    pdfs = []
+    
+    try:
+        pdfs = getAllFilesInDirectory(pathname, ".zip")
+    except Exception as e:
+        logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
+    
+    if len(pdfs) == 0:
+        failed.clear()
+        failed.add("-1")
+        return 
+    
+    pdfcounter = 1
+    for name in pdfs:
+        standard = name.split('_')[0]
+        print("***Progress of converting all Documents***: " + str(int(pdfcounter / len(pdfs) * 100)) + "%")
+        print("Specification-ID is " + str(standard) + " and name of ZIP-File is " + name)
+        if standard in noUpdate or standard in failed:
+            print("Skip Extracting of " + str(name) + " because is in noUpdate or failed (e.g., Excel-File has already been updated).\n")
+            continue
+        try:
+            print("Try to extract " + name)
+            extractZipFilesAndConvertToPDF(name, pathname, onlyWordFiles, convertDocx, convertDocxAndPDF)
+            print("Unzipping of " + name + " finished!\n")
+        except Exception as e:
+            logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
+        
+        if str(specs[standard].downloadOne) == "1" and str(specs[standard].releaseOnlineOne) in name:
+            currentUpdate(standard, "one")
+        elif str(specs[standard].downloadTwo) == "1" and str(specs[standard].releaseOnlineTwo) in name:
+            currentUpdate(standard, "two")
+        elif str(specs[standard].downloadThree) == "1" and str(specs[standard].releaseOnlineThree) in name:
+            currentUpdate(standard, "three")
+        pdfcounter += 1           
+    return 
+
+def download(srcurl, dstfilepath):
+    """
+    download the zipfile of corresponding spec
+    """
+    r = requests.get(srcurl)
+    result = False
+
+    if not os.path.exists("./Specifications/"):
+        os.makedirs("./Specifications/")
+        
+    if not os.path.exists("./Specifications/" + dstfilepath):
+        with open("./Specifications/" + dstfilepath, "wb") as code:
+            code.write(r.content)
+            result = True
+    
+    if os.path.exists("./Specifications/" + dstfilepath):
+        result = True
+            
+    return result
+
+
+def _getThreads():
+    """ Returns the number of available threads on a posix/win based system """
+    try:
+        return (int)(os.environ['NUMBER_OF_PROCESSORS'])
+    except:
+        logstring.append("\n" + "Can not read number of processors... Terminate programm" + "\n")
+        return -1
+
+###################################################################################################################################################################
+#################***************Programm Start*************************###########################################################################################
+###################################################################################################################################################################
+###################################################################################################################################################################
+#########################################################check the console parameters##############################################################################
+###################################################################################################################################################################
 logstring = []
-
 ##################################################################################################################################################################
 checkThree = False
 if "-3" in sys.argv:
@@ -578,32 +603,48 @@ cl = False
 if "-cl" in sys.argv:
     cl = True
 ####################################################################################################################################################################
-    
-# ##
+twoExcelParams = False
+if len(sys.argv) > 2:
+    if "xls" in sys.argv[1] and "xls" in sys.argv[2]:
+        twoExcelParams = True
+#####################################################################################################################################################################    
 convertDocxAndPDF = False
 if "-wxp" in sys.argv:
     convertDocxAndPDF = True
     convertDocx = False
-# ##
 
 if onlyWordFiles:
     convertDocx = False
     convertDocxAndPDF = False
 #####################################################################################################################################################################
-
+###########################################some global parameters
+####################################################################################################################################################################
 specs = dict()
 noUpdate = set()
-datumDifference = "checkSpecificationsBetween" + sys.argv[1] + "And" + sys.argv[2] + time.strftime("%d%m%Y%H%M") + "_"
-logFileName = "LogFile" + sys.argv[1] + "And" + sys.argv[2] + time.strftime("%d%m%Y%H%M") + "_"
+datumDifference = ""
+logFileName = ""
+nameFirstExcelSheet = sys.argv[1]
+nameSecondExcelSheet = ""
+if twoExcelParams:
+    datumDifference = "checkSpecificationsBetween" + sys.argv[1] + "And" + sys.argv[2] + time.strftime("%d%m%Y%H%M") + "_"
+    logFileName = "LogFile" + sys.argv[1] + "And" + sys.argv[2] + time.strftime("%d%m%Y%H%M") + "_"
+    nameSecondExcelSheet = sys.argv[2]    
+else:
+    datumDifference = "checkSpecifications" + time.strftime("%d%m%Y%H%M") + "_"
+    logFileName = "LogFile" + time.strftime("%d%m%Y%H%M") + "_"
+    nameSecondExcelSheet = nameFirstExcelSheet
 
-#############################################################################################
+##########################################################################################################################################
+##############getNumberOfAvailableThreads################################################################################################
+###########################################################################################################################################
 threadLock = threading.Lock()
 threads = []
 numberThreads = _getThreads() * 2
 print("\n*** Using " + str(numberThreads) + " Threads for comparing the versions of all specifications in the Excel-Sheets... ***\n")
-##################################################
-#
-wbOne = load_workbook(sys.argv[1])
+#####################################################################################################################################
+#############find out what specs are not in Reference ExcelSheet######################################################################
+#####################################################################################################################################
+wbOne = load_workbook(nameFirstExcelSheet)
 sheetnames = wbOne.sheetnames
 wsOne = wbOne[sheetnames[0]]
 standardsInOne = []
@@ -652,7 +693,7 @@ for row in iterOne:
         logstring.append("\n No URL-Link for " + str(row[0].value) + " available! " + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
 
 specs.pop('None', None)
-wbTwo = load_workbook(sys.argv[2])
+wbTwo = load_workbook(nameSecondExcelSheet)
 sheetnames = wbTwo.sheetnames
 wsTwo = wbTwo[sheetnames[0]]
 standardsInTwo = []
@@ -742,21 +783,22 @@ for specification in standardsInOne:
             rowCounter += 1
         except Exception as e:
             logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + " " + str(specification) + "\n")
-            
-wbTwo.save(sys.argv[2])
+    
+wbTwo.save(nameSecondExcelSheet)
 wbOne.close()
 wbTwo.close()
 standardsInOne.clear()
 standardsInTwo.clear()
-##################################################
-
-wb2 = load_workbook(sys.argv[1])
+###########################################################################################################################################################
+##############################load all specs from Excel Sheet
+###########################################################################################################################################################
+wb2 = load_workbook(nameFirstExcelSheet)
 sheetnames = wb2.sheetnames
 ws = wb2[sheetnames[0]]
 maxFirst = ws.max_row
 wb2.close()
 
-wb3 = load_workbook(sys.argv[2])
+wb3 = load_workbook(nameSecondExcelSheet)
 sheetnames = wb3.sheetnames
 ws = wb3[sheetnames[0]]
 maxSecond = ws.max_row
@@ -786,7 +828,7 @@ ws.cell(row=1, column=dateCol3).value = "DateThree"
 ws.cell(row=1, column=relCol).value = "ReleaseOne"
 ws.cell(row=1, column=relCol2).value = "ReleaseTwo"
 ws.cell(row=1, column=relCol3).value = "ReleaseThree"
-wb3.save(sys.argv[2])
+wb3.save(nameSecondExcelSheet)
 myIter = ws.iter_rows(row_offset=1, min_row=0, max_row=ws.max_row)
 
 for row in myIter:
@@ -873,11 +915,12 @@ for row in myIter:
             logstring.append("\n" + str(e) + " " + str(exc_info()) + " LineNumber: " + str(sys._getframe().f_lineno) + "\n")
             ws.cell(row=currentRow, column=(i + 1)).value = "0"
 
-wb3.save(sys.argv[2])
+wb3.save(nameSecondExcelSheet)
 wb3.close()
 
-#
-# calc the borders
+############################################################################################################################################################
+###############################Several Threads for Comparison between online information and stored information in ExcelSheet###########
+############################################################################################################################################################
 print("*** Starting all Threads *** \n\n")
 startOne = 0
 startTwo = 0
@@ -885,16 +928,15 @@ intervalTwo = round(maxSecond / numberThreads)
 if intervalTwo == 0:
     intervalTwo = 1;
 
-thread2 = fileTwo(sys.argv[2], True, startTwo, startTwo + intervalTwo, noUpdate, specs)
+thread2 = InquirerThread(nameSecondExcelSheet, True, startTwo, startTwo + intervalTwo, noUpdate, specs)
 startTwo += intervalTwo
-
 threads.append(thread2)
 
 while startTwo < maxSecond:
     endTwo = startTwo + intervalTwo
     if endTwo > maxSecond:
         endTwo = maxSecond
-    threads.append(fileTwo(sys.argv[2], False, startTwo, endTwo, noUpdate, specs))  
+    threads.append(InquirerThread(nameSecondExcelSheet, False, startTwo, endTwo, noUpdate, specs))
     startTwo = endTwo 
 
 for t in threads:
@@ -904,8 +946,9 @@ for t in threads:
     t.join()
 print("\n*******Threads finished!*********\n")
 
-#############################################################################################
+#############################################################################################################################################################
 ###############################compare version online and in ExcelSheet######################
+##############################################################################################################################################################
 standardsToCheck = []
 outputString = []
 failed = set()
@@ -937,9 +980,10 @@ for number in sorted(specs):
     urlTwo = specs[number].urlTwo
     urlThree = specs[number].urlThree
 
-    if notInOne == "1":
-        outputString.append(str(number) + " not in " + sys.argv[1] + "\n")
-        standardsToCheck.append(str(number))
+    if twoExcelParams:
+        if notInOne == "1":
+            outputString.append(str(number) + " not in " + nameFirstExcelSheet + "\n")
+            standardsToCheck.append(str(number))
     
     if versionInXl == versionOnlineOne and dateInXl == dateOnlineOne:
         pass
@@ -947,16 +991,16 @@ for number in sorted(specs):
         if versionOnlineOne == "0" or dateOnlineOne == "0" or dateOnlineOne == "None" or dateOnlineOne == "" or versionOnlineOne == "None" or versionOnlineOne == "":
             outputString.append("\n*** Check MANUALLY Version One!!! ***")
             outputString.append("" + releaseOnlineOne)
-            outputString.append(str(number) + " in " + str(sys.argv[2]) + " has different Version than Online! " + str(versionInXl) + " != " + str(versionOnlineOne))
-            outputString.append(str(number) + " in " + str(sys.argv[2]) + " has different Date than Online! " + str(dateInXl) + " != " + str(dateOnlineOne))
+            outputString.append(str(number) + " in " + str(nameSecondExcelSheet) + " has different Version than Online! " + str(versionInXl) + " != " + str(versionOnlineOne))
+            outputString.append(str(number) + " in " + str(nameSecondExcelSheet) + " has different Date than Online! " + str(dateInXl) + " != " + str(dateOnlineOne))
             outputString.append("***\n")
             standardsToCheck.append(number)
         else:
             outputString.append("" + releaseOnlineOne)
-            outputString.append(str(number) + " in " + str(sys.argv[2]) + " has different Version than Online! " + str(versionInXl) + " != " + str(versionOnlineOne))
+            outputString.append(str(number) + " in " + str(nameSecondExcelSheet) + " has different Version than Online! " + str(versionInXl) + " != " + str(versionOnlineOne))
             if number not in standardsToCheck:
                 standardsToCheck.append(number)
-            outputString.append(str(number) + " in " + str(sys.argv[2]) + " has different Date than Online! " + str(dateInXl) + " != " + str(dateOnlineOne) + "\n")
+            outputString.append(str(number) + " in " + str(nameSecondExcelSheet) + " has different Date than Online! " + str(dateInXl) + " != " + str(dateOnlineOne) + "\n")
             try:
                 if specs[number].urlOne != "None" and specs[number].urlOne != "":
                     specs[number].downloadOne = "1"
@@ -970,16 +1014,16 @@ for number in sorted(specs):
         if versionOnlineTwo == "0" or dateOnlineTwo == "0" or versionOnlineTwo == "None" or dateOnlineTwo == "" or versionOnlineTwo == "None" or dateOnlineTwo == "":
             outputString.append("\n*** Check MANUALLY Version Two!!! ***")
             outputString.append("" + releaseOnlineTwo)
-            outputString.append(str(number) + " in " + str(sys.argv[2]) + " has different Version than Online! " + str(versionInXlTwo) + " != " + str(versionOnlineTwo))
-            outputString.append(str(number) + " in " + str(sys.argv[2]) + " has different Date than Online! " + str(dateInXlTwo) + " != " + str(dateOnlineTwo))
+            outputString.append(str(number) + " in " + str(nameSecondExcelSheet) + " has different Version than Online! " + str(versionInXlTwo) + " != " + str(versionOnlineTwo))
+            outputString.append(str(number) + " in " + str(nameSecondExcelSheet) + " has different Date than Online! " + str(dateInXlTwo) + " != " + str(dateOnlineTwo))
             outputString.append("***\n")
             standardsToCheck.append(number)
         else:
             outputString.append("" + releaseOnlineTwo)
-            outputString.append(str(number) + " in " + str(sys.argv[2]) + " has different Version than Online! " + str(versionInXlTwo) + " != " + str(versionOnlineTwo))
+            outputString.append(str(number) + " in " + str(nameSecondExcelSheet) + " has different Version than Online! " + str(versionInXlTwo) + " != " + str(versionOnlineTwo))
             if number not in standardsToCheck:
                 standardsToCheck.append(number)
-            outputString.append(str(number) + " in " + str(sys.argv[2]) + " has different Date than Online! " + str(dateInXlTwo) + " != " + str(dateOnlineTwo) + "\n")
+            outputString.append(str(number) + " in " + str(nameSecondExcelSheet) + " has different Date than Online! " + str(dateInXlTwo) + " != " + str(dateOnlineTwo) + "\n")
             try:
                 if specs[number].urlTwo != "None" and specs[number].urlTwo != "":
                     specs[number].downloadTwo = "1"
@@ -994,16 +1038,16 @@ for number in sorted(specs):
             if versionOnlineThree == "0" or dateOnlineThree == "0" or versionOnlineThree == "None" or dateOnlineThree == "" or versionOnlineThree == "None" or dateOnlineThree == "":
                 outputString.append("\n*** Check MANUALLY Version Three!!! ***")
                 outputString.append("" + releaseOnlineThree)
-                outputString.append(str(number) + " in " + str(sys.argv[2]) + " has different Version than Online! " + str(versionInXlThree) + " != " + str(versionOnlineThree))
-                outputString.append(str(number) + " in " + str(sys.argv[2]) + " has different Date than Online! " + str(dateInXlThree) + " != " + str(dateOnlineThree))
+                outputString.append(str(number) + " in " + str(nameSecondExcelSheet) + " has different Version than Online! " + str(versionInXlThree) + " != " + str(versionOnlineThree))
+                outputString.append(str(number) + " in " + str(nameSecondExcelSheet) + " has different Date than Online! " + str(dateInXlThree) + " != " + str(dateOnlineThree))
                 outputString.append("***\n")
                 standardsToCheck.append(number)
             else:
                 outputString.append("" + releaseOnlineThree)
-                outputString.append(str(number) + " in " + str(sys.argv[2]) + " has different Version than Online! " + str(versionInXlThree) + " != " + str(versionOnlineThree))
+                outputString.append(str(number) + " in " + str(nameSecondExcelSheet) + " has different Version than Online! " + str(versionInXlThree) + " != " + str(versionOnlineThree))
                 if number not in standardsToCheck:
                     standardsToCheck.append(number)
-                outputString.append(str(number) + " in " + str(sys.argv[2]) + " has different Date than Online! " + str(dateInXlThree) + " != " + str(dateOnlineThree) + "\n")
+                outputString.append(str(number) + " in " + str(nameSecondExcelSheet) + " has different Date than Online! " + str(dateInXlThree) + " != " + str(dateOnlineThree) + "\n")
                 try:
                     if specs[number].urlThree != "None" and specs[number].urlThree != "":
                         specs[number].downloadThree = "1"
@@ -1048,6 +1092,8 @@ for t in thAr:
 
 print("\n*****************Finished Saving ZIPS*********************")
 ###############################################################################################################################
+#######################################Extract and convert#######################################################
+################################################################################################################################
 print("\n\n\n*****************Extracting Zips and Convert*********************")
 
 print("\nStart...\n")
@@ -1058,7 +1104,8 @@ except Exception as e:
     
 print("\n\n*********************Finished extracting and converting********************************\n\n")
 ################################################################################################################################
-
+#########################LogFile#####################################################################
+###############################################################################################################################
 print("\n\n\n*****************Writing LogFile*********************")
 
 out = open(logFileName, "w")
